@@ -1,0 +1,10 @@
+"use client";
+
+import { useState } from "react";
+import { Check, X } from "lucide-react";
+
+export default function FeedbackModal({ onClose }) {
+  const [rating, setRating] = useState(0);
+  const [sent, setSent] = useState(false);
+  return <div className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--text-main)]/60 p-4 backdrop-blur-sm"><div className="relative w-full max-w-md rounded-3xl border border-[var(--border-color)] bg-[var(--bg-panel)] p-8 text-center paper-shadow"><button onClick={onClose} className="absolute right-5 top-5 grid h-8 w-8 place-items-center rounded-full bg-[var(--accent-coral)] text-[var(--bg-main)]"><X size={16} /></button>{sent ? <><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[var(--mint)] text-[var(--text-main)]"><Check size={28} /></div><h2 className="mt-6 font-display text-3xl font-bold text-[var(--text-main)]">Thank you, truly.</h2><p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">Your tiny signal helps keep this tool focused on better study sessions and lighter print piles.</p><button onClick={onClose} className="mt-7 rounded-full bg-[var(--text-main)] px-6 py-3 text-sm font-bold text-on-ink">Back to workspace</button></> : <><p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--accent-coral)]">One last thing</p><h2 className="mt-2 font-display text-3xl font-bold text-[var(--text-main)]">How did that feel?</h2><p className="mt-3 text-sm text-[var(--text-muted)]">A quick rating helps us keep the paper magic useful.</p><div className="mt-7 flex justify-center gap-2">{[1, 2, 3, 4, 5].map((value) => <button key={value} onClick={() => setRating(value)} aria-label={`${value} stars`} className={`text-4xl transition hover:-translate-y-1 ${value <= rating ? "text-[var(--accent-coral)]" : "text-[var(--border-color)]"}`}>★</button>)}</div><button disabled={!rating} onClick={() => setSent(true)} className="mt-7 w-full rounded-full bg-[var(--text-main)] px-6 py-3 text-sm font-bold text-on-ink disabled:opacity-40">Send rating</button></>}</div></div>;
+}
