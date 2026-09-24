@@ -1,9 +1,43 @@
-"use client";
+export default function SidebarSettings({ title, description, children, onExport, exportLabel, busy, progress, exportDisabled }) {
+  return (
+    <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-[var(--border-color)] bg-[var(--bg-panel)] flex flex-col max-h-[50vh] lg:max-h-none h-full">
+      <div className="p-6 border-b border-[var(--border-color)]">
+        <h3 className="font-display text-xl font-bold">{title || "Document Settings"}</h3>
+        {description && <p className="mt-1 text-xs text-[var(--text-muted)]">{description}</p>}
+      </div>
 
-import { Check, FileText, Layers3 } from "lucide-react";
+      <div className="flex-1 overflow-y-auto p-6 space-y-8">
+        {children}
+      </div>
 
-const options = [{ value: 1, label: "Full page", detail: "Maximum writing room" }, { value: 2, label: "2-up", detail: "A balanced study sheet" }, { value: 3, label: "3-up", detail: "Compact and economical" }, { value: 4, label: "4-up", detail: "Maximum ink savings" }];
-
-export default function SidebarSettings({ nUp, setNUp, format, setFormat }) {
-  return <aside className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-panel)] p-5 text-[var(--text-main)] soft-shadow"><div className="flex items-center gap-2"><span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--mint)] text-[var(--accent-mint)]"><Layers3 size={16} /></span><div><p className="text-sm font-bold text-[var(--text-main)]">Sheet layout</p><p className="text-xs text-[var(--text-muted)]">Stacked vertically on A4</p></div></div><div className="mt-5 space-y-2">{options.map((option) => <button key={option.value} onClick={() => setNUp(option.value)} className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition ${nUp === option.value ? "border-[var(--accent-mint)] bg-[var(--bg-secondary)]" : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--accent-mint)]"}`}><span><span className="block text-sm font-bold text-[var(--text-main)]">{option.label}</span><span className="text-xs text-[var(--text-muted)]">{option.detail}</span></span><span className={`grid h-6 w-6 place-items-center rounded-full border ${nUp === option.value ? "border-[var(--accent-mint)] bg-[var(--accent-mint)] text-[var(--bg-main)]" : "border-[var(--border-color)] text-transparent"}`}>{nUp === option.value && <Check size={13} />}</span></button>)}</div><div className="mt-6 border-t border-[var(--border-color)] pt-5"><div className="flex items-center gap-2"><FileText size={15} className="text-[var(--accent-coral)]" /><p className="text-sm font-bold">Export format</p></div><div className="mt-3 flex rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] p-1"><button onClick={() => setFormat("pdf")} className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs font-bold ${format === "pdf" ? "bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm" : "text-[var(--text-muted)]"}`}>PDF</button><button onClick={() => setFormat("docx")} className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs font-bold ${format === "docx" ? "bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm" : "text-[var(--text-muted)]"}`}>DOCX</button></div></div></aside>;
+      <div className="border-t border-[var(--border-color)] p-6 bg-[var(--bg-panel)]">
+        <button
+          onClick={onExport}
+          disabled={exportDisabled || busy}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-5 py-4 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50"
+        >
+          {busy ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 rounded-full border-2 border-[var(--bg-main)] border-t-transparent animate-spin" />
+              Generating...
+            </span>
+          ) : (
+            exportLabel || "Export PDF"
+          )}
+        </button>
+        
+        {progress && (
+          <div className="mt-4 animate-rise">
+            <div className="mb-2 flex justify-between text-xs">
+              <span className="font-bold text-[var(--text-muted)]">{progress.text}</span>
+              <span className="font-mono font-bold text-[var(--accent-mint)]">{progress.percent}%</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--bg-secondary)]">
+              <div className="h-full rounded-full bg-[var(--accent-mint)] progress-shimmer transition-all duration-300" style={{ width: `${progress.percent}%` }} />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

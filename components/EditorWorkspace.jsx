@@ -1,24 +1,32 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FilePlus2 } from "lucide-react";
+import { Check, FilePlus2, Layers3 } from "lucide-react";
 import { processFiles } from "../utils/docProcessor";
 import Toolbar from "./Toolbar";
 import ThumbnailGrid from "./ThumbnailGrid";
 import ConfirmModal from "./ConfirmModal";
-import ThemeToggle from "./ThemeToggle";
+import ToolHeader from "./ToolHeader";
 
-export default function EditorWorkspace({ pages, setPages, theme, setTheme, onReset, onPreview }) {
+export default function EditorWorkspace({ pages, setPages, nUp, setNUp, theme, setTheme, onReset, onPreview, onBackToHub }) {
   const inputRef = useRef(null);
   const [insertAt, setInsertAt] = useState(pages.length);
   const [confirm, setConfirm] = useState(null);
+  const [importProgress, setImportProgress] = useState(null);
 
   async function addFile(event) {
     const files = [...event.target.files];
     if (!files.length) return;
-    const additions = await processFiles(files);
-    setPages([...pages.slice(0, insertAt), ...additions, ...pages.slice(insertAt)]);
-    event.target.value = "";
+    setImportProgress({ percent: 5, text: `Reading ${files.length} file${files.length > 1 ? "s" : ""}...` });
+    try {
+      const additions = await processFiles(files, (p) => setImportProgress(p));
+      setPages([...pages.slice(0, insertAt), ...additions, ...pages.slice(insertAt)]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setImportProgress(null);
+      event.target.value = "";
+    }
   }
 
   function requestFile(index) {
@@ -46,5 +54,30 @@ export default function EditorWorkspace({ pages, setPages, theme, setTheme, onRe
   }
 
   const included = pages.filter((page) => page.isIncluded).length;
-  return <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]"><header className="border-b border-[var(--border-color)] bg-[var(--bg-panel)]"><div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--text-main)] text-[var(--accent-mint)]">✦</span><span className="font-display text-lg font-bold">PrintPrep</span><span className="hidden rounded-full bg-[var(--mint)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest sm:inline">workspace</span></div><div className="flex items-center gap-2"><ThemeToggle theme={theme} setTheme={setTheme} /><button onClick={onPreview} className="flex items-center gap-2 rounded-full bg-[var(--accent-coral)] px-5 py-3 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110"><FilePlus2 size={16} /> Export</button></div></div></header><div className="mx-auto max-w-7xl px-6 py-8 lg:px-10"><div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-[var(--accent-coral)]">Edit your stack</p><p className="text-sm text-[var(--text-muted)]">{included} of {pages.length} pages included · drag to reorder</p></div></div><input ref={inputRef} type="file" accept=".pdf,.png,.jpg,.jpeg,.docx" multiple className="hidden" onChange={addFile} /><Toolbar pages={pages} setPages={setPages} onRequestReset={requestReset} onRequestRestore={requestRestore} /><div className="mt-8"><ThumbnailGrid pages={pages} setPages={setPages} onDelete={(id) => setPages(pages.filter((page) => page.id !== id))} onAddBlank={addBlank} onAddFile={requestFile} /></div></div>{confirm && <ConfirmModal {...confirm} onConfirm={() => confirm.action()} onClose={() => setConfirm(null)} />}</div>;
+  return <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
+    <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={onBackToHub} badge="workspace" />
+    <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
+      <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+        <div>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-[var(--accent-coral)]">Edit your stack</p>
+          <h1 className="font-display text-3xl font-bold">Slide & Deck Optimizer</h1>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">{included} of {pages.length} pages included · drag to reorder</p>
+        </div>
+        <button onClick={onPreview} className="flex items-center gap-2 rounded-full bg-[var(--accent-coral)] px-5 py-2.5 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110">
+          <FilePlus2 size={16} /> Preview & Export
+        </button>
+      </div>
+
+      <input ref={inputRef} type="file" accept=".pdf,.png,.jpg,.jpeg,.docx" multiple className="hidden" onChange={addFile} />
+
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="flex-1 space-y-6">
+          <Toolbar pages={pages} setPages={setPages} onRequestReset={requestReset} onRequestRestore={requestRestore} />
+          <ThumbnailGrid pages={pages} setPages={setPages} onDelete={(id) => setPages(pages.filter((page) => page.id !== id))} onAddBlank={addBlank} onAddFile={requestFile} />
+        </div>
+      </div>
+    </div>
+    {confirm && <ConfirmModal {...confirm} onConfirm={() => confirm.action()} onClose={() => setConfirm(null)} />}
+    {importProgress && <div className="fixed inset-0 z-50 flex items-end justify-center p-6 pointer-events-none"><div className="pointer-events-auto w-full max-w-sm rounded-2xl border border-[var(--border-color)] bg-[var(--bg-panel)] p-5 shadow-2xl animate-rise"><div className="flex items-center justify-between text-xs mb-3"><span className="flex items-center gap-2 font-bold text-[var(--text-main)]"><span className="h-2 w-2 rounded-full bg-[var(--accent-mint)] animate-pulse" />{importProgress.text}</span><span className="font-mono font-bold text-[var(--accent-mint)]">{importProgress.percent}%</span></div><div className="h-2 w-full overflow-hidden rounded-full bg-[var(--bg-secondary)]"><div className="h-full rounded-full progress-shimmer transition-all duration-300 ease-out" style={{ width: `${importProgress.percent}%` }} /></div></div></div>}
+  </div>;
 }

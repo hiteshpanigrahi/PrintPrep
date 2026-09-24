@@ -11,7 +11,7 @@
 		--accent-mint: #3F9672;
 		--accent-coral: #E86F59;
 		--border-color: #D7DDD6;
-		--font-body: "JetBrains Mono";
+		--font-body: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
 		--font-display: Georgia;
 		--ink: var(--text-main);
 		--muted: var(--text-muted);
@@ -47,7 +47,7 @@
 	body {
 		background-color: var(--bg-main);
 		color: var(--text-main);
-		font-family: "JetBrains Mono", monospace;
+		font-family: var(--font-body);
 	}
 }
 
@@ -84,3 +84,30 @@ button { cursor: pointer; }
 .animate-rise { animation: rise .55s ease both; }
 @keyframes pulse-soft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
 .drop-pulse { animation: pulse-soft 2.2s ease-in-out infinite; }
+
+/* Hide Scrollbars */
+.preview-scroll::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+.preview-scroll,
+.custom-scrollbar {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+/* Progress Bar Shimmer */
+@keyframes progress-shimmer {
+	0% { background-position: -200% 0; }
+	100% { background-position: 200% 0; }
+}
+.progress-shimmer {
+	background-image: linear-gradient(
+		90deg,
+		var(--accent-mint) 0%,
+		color-mix(in srgb, var(--accent-mint), #ffffff 30%) 50%,
+		var(--accent-mint) 100%
+	);
+	background-size: 200% 100%;
+	animation: progress-shimmer 2s infinite linear;
+}
