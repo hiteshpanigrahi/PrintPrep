@@ -116,6 +116,7 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="PrintPrep Logo" className="h-8 w-auto object-contain" />
+          <span className="font-display text-xl font-bold tracking-tight text-[var(--text-main)]">PrintPrep</span>
           <span className="hidden rounded-full bg-[var(--mint)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] sm:inline">Studio</span>
         </div>
         <div className="flex items-center gap-3">

@@ -10,6 +10,7 @@ export default function ToolHeader({ theme, setTheme, onBackToHub, badge }) {
             onClick={onBackToHub ? onBackToHub : undefined}
           >
             <img src="/logo.png" alt="PrintPrep Logo" className="h-8 w-auto object-contain" />
+            <span className="font-display text-xl font-bold tracking-tight text-[var(--text-main)]">PrintPrep</span>
             {badge && <span className="hidden rounded-full bg-[var(--mint)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] sm:inline">{badge}</span>}
           </div>
           <div className="flex items-center gap-2">
