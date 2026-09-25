@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Star, X, CupSoda, Send, Check, Lock } from "lucide-react";
+import { Star, X, CupSoda, Send, Check } from "lucide-react";
 import PeekRating from "./PeekRating";
 import { getUserRating, submitToGoogleSheets } from "../utils/analytics";
 
@@ -79,11 +79,6 @@ export default function FeedbackModal({ onClose, onSupport }) {
                 idleColor="var(--border-color)"
                 size={30}
               />
-            </div>
-
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--bg-secondary)] px-3 py-1 text-[11px] text-[var(--text-muted)] border border-[var(--border-color)]">
-              <Lock size={12} className="text-[var(--accent-mint)]" />
-              <span>Rating is permanently locked for this device</span>
             </div>
 
             {existingRating.feedback && (
