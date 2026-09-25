@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FileImage, FilePlus2, Files, Layers, Scissors, Minimize } from "lucide-react";
+import { FileImage, FilePlus2, Files, Layers, Scissors, Minimize, Coffee } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import SupportModal from "./SupportModal";
 
 const heroCopy = [
   {
@@ -33,7 +34,7 @@ const TOOLS = [
     icon: Layers,
     color: "var(--accent-mint)",
     bg: "var(--mint)",
-    label: "Slide & Deck Optimizer",
+    label: "Coaching Slides Optimizer",
     description: "Invert dark slides, cull pages, and print multiple slides per sheet on A4. The core PrintPrep experience.",
   },
   {
@@ -42,7 +43,7 @@ const TOOLS = [
     color: "var(--accent-coral)",
     bg: "#fde8e4",
     label: "Merge & Organize PDFs",
-    description: "Combine PDFs, DOCX files, and images into one unified document with drag-and-drop page reordering.",
+    description: "Combine PDFs, DOCX files, and images into one unified document with drag-and-drop page reordering and add blank pages.",
   },
   {
     id: "images-to-pdf",
@@ -81,6 +82,8 @@ const TOOLS = [
 export default function DashboardHub({ onLaunch, theme, setTheme }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fade, setFade] = useState(true);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(0);
 
   const intervalRef = useRef(null);
 
@@ -110,6 +113,22 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
     }, 700);
   };
 
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        handleDotClick((currentIndex + 1) % heroCopy.length);
+      } else {
+        handleDotClick((currentIndex - 1 + heroCopy.length) % heroCopy.length);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
       {/* Navbar */}
@@ -125,7 +144,11 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
       </header>
 
       {/* Hero */}
-      <div className="mx-auto max-w-7xl px-6 pt-12 pb-6 lg:px-10 lg:pt-16 min-h-[300px] flex flex-col justify-center">
+      <div 
+        className="mx-auto max-w-7xl px-6 pt-12 pb-6 lg:px-10 lg:pt-16 min-h-[300px] flex flex-col justify-center"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <div className={`transition-opacity duration-700 ${fade ? "opacity-100" : "opacity-0"}`}>
           <p className="mb-3 text-xs font-mono font-bold uppercase tracking-widest text-[var(--accent-coral)]">
             {heroCopy[currentIndex].kicker}
@@ -174,7 +197,7 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
                 </span>
                 <h2 className="mb-2 font-display text-lg font-bold text-[var(--text-main)]">{tool.label}</h2>
                 <p className="text-xs leading-relaxed text-[var(--text-muted)]">{tool.description}</p>
-                <span className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-2 text-xs font-bold text-[var(--text-main)] transition group-hover:border-[var(--accent-mint)] group-hover:bg-[var(--bg-panel)]">
+                <span className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-2 text-xs font-bold text-[var(--text-main)] transition group-hover:border-[var(--accent-mint)] group-hover:bg-[var(--bg-panel)]">
                   Open tool →
                 </span>
               </button>
@@ -184,10 +207,19 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
       </div>
       {/* Footer */}
       <footer className="mx-auto max-w-7xl px-6 py-10 lg:px-10 border-t border-[var(--border-color)]">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[var(--text-muted)]">
-          <p>
-            Created by <span className="font-bold text-[var(--text-main)]">Hitesh Panigrahi</span>
-          </p>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-[var(--text-muted)]">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <p>
+              Created by <span className="font-bold text-[var(--text-main)]">Hitesh Panigrahi</span>
+            </p>
+            <button 
+              onClick={() => setIsSupportOpen(true)}
+              className="flex items-center gap-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] px-4 py-1.5 text-xs font-bold text-[var(--text-main)] transition hover:brightness-105 hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95 shadow-sm"
+            >
+              <Coffee size={14} className="text-[var(--accent-coral)]" />
+              Buy me a coffee
+            </button>
+          </div>
           <div className="flex items-center gap-5">
             <a href="https://github.com/hiteshpanigrahi" target="_blank" rel="noreferrer" className="hover:text-[var(--accent-mint)] transition-colors" aria-label="GitHub">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path></svg>
@@ -201,6 +233,8 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
           </div>
         </div>
       </footer>
+
+      {isSupportOpen && <SupportModal onClose={() => setIsSupportOpen(false)} />}
     </div>
   );
 }

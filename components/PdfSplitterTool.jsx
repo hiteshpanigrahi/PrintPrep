@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Check, CheckSquare, Download, LoaderCircle, Scissors, Square, UploadCloud } from "lucide-react";
+import { Check, CheckSquare, Download, LoaderCircle, Scissors, Settings, Square, UploadCloud } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import { PDFDocument } from "pdf-lib";
 import ToolHeader from "./ToolHeader";
@@ -211,7 +211,7 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
-      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={onBackToHub} badge="Splitter" />
+      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(file !== null)} badge="Splitter" />
 
       <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
         <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -227,20 +227,20 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
             onChange={(e) => onDrop([...e.target.files])}
           />
           {fileData && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex gap-2 self-end w-full md:w-auto justify-end">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="rounded-full border border-[var(--border-color)] bg-[var(--bg-panel)] px-4 py-2 text-xs font-bold text-[var(--text-main)] transition hover:border-[var(--accent-mint)]"
+                className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-3 py-2.5 text-xs font-bold text-[var(--text-main)] transition hover:border-[var(--accent-coral)] hover:text-[var(--accent-coral)] w-1/2 md:w-auto"
               >
                 Change PDF
               </button>
               <button
                 onClick={handleExtract}
                 disabled={busy || selectedPages.size === 0}
-                className="flex items-center gap-2 rounded-full bg-[var(--accent-coral)] px-5 py-2.5 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-3 py-2.5 text-xs font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50 w-1/2 md:w-auto"
               >
                 {busy ? <LoaderCircle className="animate-spin" size={15} /> : <Download size={15} />}
-                {busy ? `${progress?.percent ?? 0}% Exporting...` : `Extract ${selectedPages.size} Page${selectedPages.size === 1 ? "" : "s"}`}
+                {busy ? `${progress?.percent ?? 0}%` : `Export`}
               </button>
             </div>
           )}
@@ -285,7 +285,7 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+          <div className="flex flex-col-reverse gap-6 lg:flex-row lg:items-start">
             {/* Main Canvas - Left Column */}
             <div className="flex-1 space-y-6">
               {/* Thumbnail Grid */}
@@ -337,7 +337,9 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
             {/* Sidebar - Right Column */}
             <div className="w-full shrink-0 space-y-6 lg:w-80">
               <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-panel)] p-6 shadow-sm">
-                <h3 className="mb-4 font-display text-lg font-bold">Extraction Summary</h3>
+                <h3 className="mb-4 flex items-center gap-2 font-display text-lg font-bold">
+                  <Settings size={20} /> Settings
+                </h3>
                 <div className="mb-6 flex items-center justify-between rounded-xl bg-[var(--bg-secondary)] p-4">
                   <div className="flex flex-col">
                     <span className="text-3xl font-black text-[var(--accent-mint)] leading-none">{selectedPages.size}</span>
@@ -379,18 +381,10 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
                     onClick={invertSelection}
                     className="flex-1 rounded-lg border border-[var(--border-color)] bg-[var(--bg-main)] px-2 py-2 text-xs font-bold text-[var(--text-main)] transition hover:border-[var(--accent-mint)]"
                   >
-                    Invert
+                    Invert Selection
                   </button>
                 </div>
 
-                <button
-                  onClick={handleExtract}
-                  disabled={busy || selectedPages.size === 0}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-5 py-4 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50"
-                >
-                  {busy ? <LoaderCircle className="animate-spin" size={18} /> : <Download size={18} />}
-                  {busy ? "Extracting..." : "Extract PDF"}
-                </button>
               </div>
             </div>
           </div>

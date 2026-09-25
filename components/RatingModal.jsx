@@ -18,7 +18,7 @@ export default function RatingModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="animate-rise relative w-full max-w-md overflow-hidden rounded-3xl border border-[var(--border-color)] bg-[var(--bg-panel)] p-8 text-center shadow-2xl">
         <button
           onClick={onClose}

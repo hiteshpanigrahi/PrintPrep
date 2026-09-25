@@ -95,7 +95,7 @@ export default function CompressorTool({ theme, setTheme, onBackToHub, onDownloa
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
-      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={onBackToHub} badge="Compressor" />
+      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(file !== null)} badge="Compressor" />
 
       <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
         <div className="mb-8">
@@ -258,7 +258,7 @@ export default function CompressorTool({ theme, setTheme, onBackToHub, onDownloa
       </div>
 
       {showExportModal && compressedBlobs && (
-        <div className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl border border-[var(--border-color)] bg-[var(--bg-panel)] p-6 paper-shadow animate-rise relative">
             <button onClick={() => setShowExportModal(false)} className="absolute right-5 top-5 text-[var(--text-muted)] hover:text-[var(--text-main)]">
               <X size={18} />

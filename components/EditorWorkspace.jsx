@@ -55,7 +55,7 @@ export default function EditorWorkspace({ pages, setPages, nUp, setNUp, theme, s
 
   const included = pages.filter((page) => page.isIncluded).length;
   return <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
-    <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={onBackToHub} badge="workspace" />
+    <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(pages.length > 0)} badge="workspace" />
     <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
       <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div>
@@ -63,8 +63,8 @@ export default function EditorWorkspace({ pages, setPages, nUp, setNUp, theme, s
           <h1 className="font-display text-3xl font-bold">Slide & Deck Optimizer</h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">{included} of {pages.length} pages included · drag to reorder</p>
         </div>
-        <button onClick={onPreview} className="flex items-center gap-2 rounded-full bg-[var(--accent-coral)] px-5 py-2.5 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110">
-          <FilePlus2 size={16} /> Preview & Export
+        <button onClick={onPreview} className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-3 py-2.5 text-xs font-bold text-[var(--bg-main)] transition hover:brightness-110 self-end w-1/2 md:w-auto">
+          <FilePlus2 size={15} /> Export
         </button>
       </div>
 

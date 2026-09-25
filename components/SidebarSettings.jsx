@@ -1,4 +1,4 @@
-export default function SidebarSettings({ title, description, children, onExport, exportLabel, busy, progress, exportDisabled }) {
+export default function SidebarSettings({ title, description, children, onExport, exportLabel, busy, progress, exportDisabled, onCancel }) {
   return (
     <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-[var(--border-color)] bg-[var(--bg-panel)] flex flex-col max-h-[50vh] lg:max-h-none h-full">
       <div className="p-6 border-b border-[var(--border-color)]">
@@ -11,20 +11,31 @@ export default function SidebarSettings({ title, description, children, onExport
       </div>
 
       <div className="border-t border-[var(--border-color)] p-6 bg-[var(--bg-panel)]">
-        <button
-          onClick={onExport}
-          disabled={exportDisabled || busy}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-5 py-4 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50"
-        >
-          {busy ? (
-            <span className="flex items-center gap-2">
-              <span className="h-4 w-4 rounded-full border-2 border-[var(--bg-main)] border-t-transparent animate-spin" />
-              Generating...
-            </span>
-          ) : (
-            exportLabel || "Export PDF"
+        <div className="flex flex-row gap-3">
+          {onCancel && (
+            <button
+              onClick={onCancel}
+              disabled={busy}
+              className="flex-1 rounded-xl border border-[var(--border-color)] px-5 py-4 text-sm font-bold text-[var(--text-main)] transition hover:bg-[var(--bg-secondary)] disabled:opacity-50"
+            >
+              Keep editing
+            </button>
           )}
-        </button>
+          <button
+            onClick={onExport}
+            disabled={exportDisabled || busy}
+            className={`flex-1 flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-5 py-4 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50`}
+          >
+            {busy ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 rounded-full border-2 border-[var(--bg-main)] border-t-transparent animate-spin" />
+                Generating...
+              </span>
+            ) : (
+              exportLabel || "Export"
+            )}
+          </button>
+        </div>
         
         {progress && (
           <div className="mt-4 animate-rise">

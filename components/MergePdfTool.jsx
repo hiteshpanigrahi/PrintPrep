@@ -75,7 +75,7 @@ export default function MergePdfTool({ theme, setTheme, onBackToHub, onDownloade
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
-      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={onBackToHub} badge="Merge" />
+      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(pages.length > 0)} badge="Merge" />
 
       <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
         <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -85,8 +85,8 @@ export default function MergePdfTool({ theme, setTheme, onBackToHub, onDownloade
             {pages.length > 0 && <p className="mt-1 text-sm text-[var(--text-muted)]">{included} of {pages.length} pages included · drag to reorder</p>}
           </div>
           {pages.length > 0 && (
-            <button onClick={() => setShowPreview(true)} className="flex items-center gap-2 rounded-full bg-[var(--accent-coral)] px-5 py-2.5 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110">
-              <FilePlus2 size={16} /> Preview & Export
+            <button onClick={() => setShowPreview(true)} className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-3 py-2.5 text-xs font-bold text-[var(--bg-main)] transition hover:brightness-110 self-end w-1/2 md:w-auto">
+              <FilePlus2 size={15} /> Export
             </button>
           )}
         </div>
@@ -108,11 +108,7 @@ export default function MergePdfTool({ theme, setTheme, onBackToHub, onDownloade
             <div className="flex-1 space-y-6">
               <Toolbar pages={pages} setPages={setPages} onRequestReset={requestReset} onRequestRestore={requestRestore} showFilters={false} />
               
-              <div {...getRootProps()} className={`rounded-xl border-2 border-dashed py-4 text-center text-sm font-bold transition ${isDragActive ? "border-[var(--accent-coral)] bg-[var(--bg-panel)] text-[var(--accent-coral)]" : "border-[var(--border-color)] text-[var(--text-muted)]"}`}>
-                <input {...getInputProps()} />
-                {isDragActive ? "Drop to add pages here" : "Drag more files here to append pages"}
-              </div>
-
+              
               {progress && (
                 <div className="mb-4 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] p-4 animate-rise">
                   <div className="mb-2 flex justify-between text-xs">

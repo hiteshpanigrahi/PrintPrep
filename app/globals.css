@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+}
 @layer base {
 	:root {
 		--bg-main: #F3F1EA;

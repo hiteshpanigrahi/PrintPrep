@@ -12,6 +12,7 @@ import ImagesToPdfTool from "../components/ImagesToPdfTool";
 import PdfToImagesTool from "../components/PdfToImagesTool";
 import PdfSplitterTool from "../components/PdfSplitterTool";
 import CompressorTool from "../components/CompressorTool";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function Home() {
   const [screen, setScreen] = useState("hub"); // "hub" | "slide-landing" | "slide-editor" | "merge-pdf" | "images-to-pdf" | "pdf-to-images" | "pdf-splitter"
@@ -19,36 +20,66 @@ export default function Home() {
   const [nUp, setNUp] = useState(2);
   const [theme, setTheme] = useState("light");
   const [modal, setModal] = useState(null);
+  const [confirmBack, setConfirmBack] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setTheme(isDark ? "dark" : "light");
+
+      const handlePopState = (e) => {
+        if (e.state && e.state.screen) {
+          setScreen(e.state.screen);
+        } else {
+          setScreen("hub");
+        }
+      };
+      window.addEventListener("popstate", handlePopState);
+      return () => window.removeEventListener("popstate", handlePopState);
     }
   }, []);
 
+  function changeScreen(newScreen) {
+    if (typeof window !== "undefined") {
+      window.history.pushState({ screen: newScreen }, "", `?tool=${newScreen}`);
+    }
+    setScreen(newScreen);
+  }
+
   function handleLaunchTool(toolId) {
     if (toolId === "slide-optimizer") {
-      setScreen(pages.length > 0 ? "slide-editor" : "slide-landing");
+      setPages([]);
+      changeScreen("slide-landing");
     } else {
-      setScreen(toolId);
+      changeScreen(toolId);
     }
   }
 
   function handleFilesReady(nextPages) {
     setPages(nextPages);
-    setScreen("slide-editor");
+    changeScreen("slide-editor");
   }
 
   function handleResetSlideOptimizer() {
     setPages([]);
-    setScreen("slide-landing");
+    changeScreen("slide-landing");
     setModal(null);
   }
 
-  function handleBackToHub() {
-    setScreen("hub");
+  function handleBackToHub(eOrBool) {
+    const requiresConfirmation = typeof eOrBool === "boolean" ? eOrBool : true;
+    if (requiresConfirmation) {
+      setConfirmBack(true);
+    } else {
+      confirmBackToHub();
+    }
+  }
+
+  function confirmBackToHub() {
+    setConfirmBack(false);
+    setPages([]);
+    changeScreen("hub");
   }
 
   return (
@@ -161,6 +192,15 @@ export default function Home() {
         />
       )}
       {modal === "feedback" && <FeedbackModal onClose={() => setModal(null)} />}
+      {confirmBack && (
+        <ConfirmModal
+          title="Leave Workspace?"
+          message="Are you sure you want to go back? Any unsaved progress in this tool will be lost and the workspace will be reset."
+          confirmLabel="Leave"
+          onConfirm={confirmBackToHub}
+          onClose={() => setConfirmBack(false)}
+        />
+      )}
       </main>
     </ToastProvider>
   );

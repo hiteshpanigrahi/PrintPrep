@@ -150,7 +150,7 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
-      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={onBackToHub} badge="PDF → Images" />
+      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(file !== null)} badge="PDF → Images" />
 
       <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -159,28 +159,34 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
             <h1 className="font-display text-3xl font-bold">Export PDF Pages as Images</h1>
             {images.length > 0 && <p className="mt-1 text-sm text-[var(--text-muted)]">{images.length} pages rendered</p>}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-end gap-2">
             {/* Resolution selector */}
-            <div className="flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--bg-panel)] px-4 py-2">
-              <span className="text-xs font-bold text-[var(--text-muted)]">Quality</span>
-              {[1, 2, 3].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setScale(s)}
-                  className={`rounded-full px-2.5 py-1 text-xs font-bold transition ${scale === s ? "bg-[var(--accent-mint)] text-[var(--bg-main)]" : "text-[var(--text-muted)] hover:text-[var(--text-main)]"}`}
-                >
-                  {s === 1 ? "Standard" : s === 2 ? "High" : "Maximum"}
-                </button>
-              ))}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] pl-1">Quality</span>
+              <div className="relative flex rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] p-1">
+                <div 
+                  className="absolute bottom-1 left-1 top-1 w-[calc((100%-8px)/3)] rounded-lg bg-[var(--bg-card)] shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                  style={{ transform: `translateX(calc(${scale - 1} * 100%))` }}
+                />
+                {[1, 2, 3].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setScale(s)}
+                    className={`relative z-10 flex-1 px-4 py-1.5 text-center text-xs font-bold rounded-lg transition-colors duration-300 ${scale === s ? "text-[var(--text-main)]" : "text-[var(--text-muted)] hover:text-[var(--text-main)]"}`}
+                  >
+                    {s === 1 ? "Standard" : s === 2 ? "High" : "Max"}
+                  </button>
+                ))}
+              </div>
             </div>
             {images.length > 0 && (
               <button
                 onClick={downloadAllZip}
                 disabled={busy}
-                className="flex items-center gap-2 rounded-full bg-[var(--accent-coral)] px-5 py-2.5 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-3 py-2.5 text-xs font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50 self-end w-1/2 md:w-auto"
               >
                 {busy ? <LoaderCircle className="animate-spin" size={15} /> : <Download size={15} />}
-                {busy ? `${progress?.percent ?? 0}% Compressing...` : "Download All as ZIP"}
+                {busy ? `${progress?.percent ?? 0}%` : "Export ZIP"}
               </button>
             )}
           </div>
@@ -223,7 +229,7 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
                   <div className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-[var(--accent-mint)] text-[10px] font-bold text-[var(--bg-main)]">{img.pageNum}</div>
                   
                   {/* Hover Actions */}
-                  <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-sm pointer-events-none">
+                  <div className="hidden md:flex absolute inset-0 items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-sm pointer-events-none">
                     <button onClick={(e) => { e.stopPropagation(); rotateImage(img.pageNum); }} className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-110" aria-label="Rotate">
                       <RotateCw size={18} />
                     </button>
@@ -234,8 +240,21 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
 
                   <button
                     onClick={() => downloadOne(img)}
-                    className="absolute bottom-2 right-2 flex items-center gap-1.5 rounded-full bg-[var(--bg-panel)] px-3 py-1.5 text-xs font-bold opacity-0 transition group-hover:opacity-100 border border-[var(--border-color)] hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)] z-10"
+                    className="hidden md:flex absolute bottom-2 right-2 items-center gap-1.5 rounded-full bg-[var(--bg-panel)] px-3 py-1.5 text-xs font-bold opacity-0 transition group-hover:opacity-100 border border-[var(--border-color)] hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)] z-10"
                   >
+                    <Download size={12} /> Save
+                  </button>
+                </div>
+                <div className="flex md:hidden items-center justify-between rounded-b-xl bg-[var(--bg-card)] px-3 py-2.5">
+                  <div className="flex gap-2">
+                    <button onClick={(e) => { e.stopPropagation(); rotateImage(img.pageNum); }} className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]" aria-label="Rotate">
+                      <RotateCw size={14} />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); removeImage(img.pageNum); }} className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-coral)] hover:text-[var(--bg-main)]" aria-label="Remove">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                  <button onClick={() => downloadOne(img)} className="flex items-center gap-1.5 rounded-full bg-[var(--bg-secondary)] px-3 py-1.5 text-xs font-bold text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]">
                     <Download size={12} /> Save
                   </button>
                 </div>

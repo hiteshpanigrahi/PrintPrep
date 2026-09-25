@@ -251,7 +251,7 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
-      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={onBackToHub} badge="Images → PDF Workspace" />
+      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(images.length > 0)} badge="Images → PDF Workspace" />
 
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto">
         {/* Main Center Canvas */}
@@ -263,18 +263,18 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
               <p className="mt-1 text-sm text-[var(--text-muted)]">Drag to reorder. Hover over an image to rotate or insert pages between.</p>
             </div>
             {images.length > 0 && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowExportModal(true)}
-                  className="rounded-full bg-[var(--accent-coral)] px-5 py-2.5 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110"
-                >
-                  Export PDF
-                </button>
+              <div className="flex gap-2 self-end w-full md:w-auto justify-end">
                 <button
                   onClick={() => setImages([])}
-                  className="rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-2.5 text-sm font-bold text-[var(--text-main)] transition hover:border-[var(--accent-coral)] hover:text-[var(--accent-coral)]"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-3 py-2.5 text-xs font-bold text-[var(--text-main)] transition hover:border-[var(--accent-coral)] hover:text-[var(--accent-coral)] w-1/2 md:w-auto"
                 >
                   Clear All
+                </button>
+                <button
+                  onClick={() => setShowExportModal(true)}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-3 py-2.5 text-xs font-bold text-[var(--bg-main)] transition hover:brightness-110 w-1/2 md:w-auto"
+                >
+                  <FileImage size={15} /> Export
                 </button>
               </div>
             )}
@@ -308,7 +308,7 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
                               <div className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-[var(--accent-mint)] text-xs font-bold text-[var(--bg-main)] shadow-sm">{index + 1}</div>
                               
                               {/* Hover Actions */}
-                              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-sm">
+                              <div className="hidden md:flex absolute inset-0 items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-sm">
                                 <button onClick={() => rotate(img.id, -90)} className="grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-110" aria-label="Rotate CCW">
                                   <RotateCw size={18} className="-scale-x-100" />
                                 </button>
@@ -317,16 +317,21 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
                                 </button>
                               </div>
 
-                              <div className="absolute bottom-2 left-2 opacity-0 transition-opacity group-hover:opacity-100">
+                              <div className="hidden md:block absolute bottom-2 left-2 opacity-0 transition-opacity group-hover:opacity-100">
                                 <span className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm"><GripVertical size={14} /></span>
                               </div>
                             </div>
                             
                             <div className="flex items-center justify-between rounded-b-2xl bg-[var(--bg-card)] px-3 py-3">
-                              <span className="truncate text-xs font-bold text-[var(--text-muted)] max-w-[120px]">{img.name}</span>
-                              <button onClick={() => remove(img.id)} className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-coral)] hover:text-[var(--bg-main)]">
-                                <Trash2 size={14} />
-                              </button>
+                              <span className="truncate text-xs font-bold text-[var(--text-muted)] max-w-[80px]">{img.name}</span>
+                              <div className="flex gap-2">
+                                <button onClick={() => rotate(img.id, 90)} className="grid h-7 w-7 md:hidden place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]">
+                                  <RotateCw size={14} />
+                                </button>
+                                <button onClick={() => remove(img.id)} className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-coral)] hover:text-[var(--bg-main)]">
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
                             </div>
                             
                             <InsertMenu index={index + 1} onInsert={handleInsert} />
@@ -350,7 +355,7 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
       </div>
 
       {showExportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
           <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-[var(--bg-main)] shadow-2xl animate-rise flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between border-b border-[var(--border-color)] bg-[var(--bg-panel)] px-6 py-5">
               <div>
@@ -370,6 +375,7 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
               busy={busy}
               progress={progress}
               exportDisabled={images.length === 0}
+              onCancel={() => !busy && setShowExportModal(false)}
             >
               {/* Orientation Options */}
               <div>
