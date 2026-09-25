@@ -81,11 +81,16 @@ export default function FeedbackModal({ onClose, onSupport }) {
               />
             </div>
 
-            {existingRating.feedback && (
-              <p className="mt-3 text-xs italic text-[var(--text-muted)] bg-[var(--bg-secondary)] p-2.5 rounded-xl border border-[var(--border-color)] max-w-xs mx-auto">
-                &ldquo;{existingRating.feedback}&rdquo;
-              </p>
-            )}
+            {existingRating.feedback ? (
+              <div className="mt-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] p-3 text-left max-w-xs mx-auto">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block mb-1">
+                  Your feedback:
+                </span>
+                <p className="text-xs italic text-[var(--text-main)] leading-relaxed">
+                  &ldquo;{existingRating.feedback}&rdquo;
+                </p>
+              </div>
+            ) : null}
 
             {onSupport && (
               <div className="mt-5 rounded-2xl border border-[var(--accent-coral)]/30 bg-[var(--accent-coral)]/10 p-4 text-center">

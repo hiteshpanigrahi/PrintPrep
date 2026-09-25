@@ -14,7 +14,6 @@ import PdfSplitterTool from "../components/PdfSplitterTool";
 import CompressorTool from "../components/CompressorTool";
 import ConfirmModal from "../components/ConfirmModal";
 import SupportPage from "../components/SupportPage";
-import { hasUserRated } from "../utils/analytics";
 
 export default function Home() {
   const [screen, setScreen] = useState("hub"); // "hub" | "slide-landing" | "slide-editor" | "merge-pdf" | "images-to-pdf" | "pdf-to-images" | "pdf-splitter"
@@ -108,9 +107,7 @@ export default function Home() {
   }
 
   function handleDownloadComplete() {
-    if (!hasUserRated()) {
-      setModal("feedback");
-    }
+    setModal("feedback");
   }
 
   return (
