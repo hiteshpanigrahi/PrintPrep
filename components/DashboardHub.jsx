@@ -211,16 +211,16 @@ export default function DashboardHub({ onLaunch, theme, setTheme, onFeedback }) 
       </div>
       {/* Footer */}
       <footer className="mx-auto max-w-7xl px-6 py-10 lg:px-10 border-t border-[var(--border-color)]">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-[var(--text-muted)]">
-          <div className="flex flex-col items-center md:items-start gap-1">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6 text-sm text-[var(--text-muted)]">
+          <div className="flex flex-col items-center lg:items-start gap-1">
             <p>
               Created by <span className="font-bold text-[var(--text-main)]">Hitesh Panigrahi</span>
             </p>
           </div>
           
-          <div className="flex flex-col items-center md:items-end gap-3.5">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 flex-wrap justify-center">
             {/* Action Buttons */}
-            <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap justify-center md:justify-end">
+            <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap justify-center">
               <button
                 onClick={onFeedback}
                 className="flex items-center gap-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] px-3.5 py-1.5 text-xs font-bold text-[var(--text-main)] transition hover:border-[var(--accent-mint)] hover:text-[var(--accent-mint)] hover:scale-105 active:scale-95 shadow-sm"
@@ -245,8 +245,8 @@ export default function DashboardHub({ onLaunch, theme, setTheme, onFeedback }) 
               </button>
             </div>
 
-            {/* Socials on a new line */}
-            <div className="flex items-center gap-4 text-[var(--text-muted)]">
+            {/* Socials: next line on mobile/responsive, inline with separator on larger screens */}
+            <div className="flex items-center gap-4 text-[var(--text-muted)] pt-1 sm:pt-0 sm:border-l sm:border-[var(--border-color)] sm:pl-5">
               <a href="https://github.com/hiteshpanigrahi" target="_blank" rel="noreferrer" className="hover:text-[var(--accent-mint)] transition-colors" aria-label="GitHub">
                 <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path></svg>
               </a>
