@@ -49,7 +49,7 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
 
   if (!mounted) return null;
 
-  return createPortal(
+  return createPortal( 
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="flex flex-col lg:flex-row h-auto lg:h-full max-h-[92vh] w-full max-w-6xl overflow-y-auto lg:overflow-hidden rounded-3xl border border-[var(--border-color)] bg-[var(--bg-panel)] text-[var(--text-main)] paper-shadow">
 
@@ -74,7 +74,7 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
               </button>
             </div>
 
-            <div className="mt-6 w-full min-h-[360px] sm:min-h-[400px] lg:min-h-0 lg:h-full lg:flex-1">
+            <div className="mt-6 w-full h-[360px] sm:h-[400px] lg:h-full lg:flex-1">
               <PreviewPanel ref={previewPanelRef} pages={pages} nUp={nUp} sheets={sheets} metrics={metrics} />
             </div>
           </div>
@@ -87,7 +87,7 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
             >
               Keep editing
             </button>
-            
+
             {/* Scroll Controls */}
             <div className="flex items-center gap-2">
               <button
@@ -98,7 +98,7 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
               >
                 <ChevronLeft size={20} />
               </button>
-              
+
               <button
                 onClick={() => previewPanelRef.current?.scrollBy(350)}
                 disabled={sheets.length <= 1}

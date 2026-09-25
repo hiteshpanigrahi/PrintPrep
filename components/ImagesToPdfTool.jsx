@@ -180,7 +180,7 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
     return files
       .filter((f) => ["image/png", "image/jpeg", "image/webp"].includes(f.type))
       .map((f) => ({
-        id: crypto.randomUUID(),
+        id: typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "img_" + Math.random().toString(36).slice(2, 9) + Date.now(),
         url: URL.createObjectURL(f),
         type: f.type,
         name: f.name,

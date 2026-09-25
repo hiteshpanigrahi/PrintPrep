@@ -121,8 +121,8 @@ export default function MergePdfTool({ theme, setTheme, onBackToHub, onDownloade
               )}
 
               <ThumbnailGrid pages={pages} setPages={setPages} onDelete={(id) => setPages(pages.filter((page) => page.id !== id))} onAddFile={() => fileInputRef.current?.click()} onAddBlank={(idx) => {
-                const blankUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
-                const newPage = { id: crypto.randomUUID(), fileType: "BLANK PAGE", thumbnailUrl: blankUrl, isIncluded: true, rotation: 0 };
+                const genId = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "pg_" + Math.random().toString(36).slice(2, 9) + Date.now();
+                const newPage = { id: genId, fileType: "BLANK PAGE", thumbnailUrl: blankUrl, isIncluded: true, rotation: 0 };
                 const nextPages = [...pages];
                 nextPages.splice(idx, 0, newPage);
                 setPages(nextPages);

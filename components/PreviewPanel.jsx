@@ -27,16 +27,16 @@ const PreviewPanel = forwardRef(({ pages, nUp, sheets, metrics }, ref) => {
       <div 
         ref={scrollRef}
         onWheel={handleWheel}
-        className="flex max-w-full snap-x snap-mandatory overflow-x-auto rounded-2xl bg-[var(--bg-secondary)] p-4 sm:p-5 custom-scrollbar h-full min-h-[330px] lg:min-h-0 items-center"
+        className="flex max-w-full snap-x snap-mandatory overflow-x-auto rounded-2xl bg-[var(--bg-secondary)] p-3 sm:p-5 custom-scrollbar h-full items-center"
       >
-      <div className="flex flex-row gap-4 h-full items-center py-2">
+      <div className="flex flex-row gap-4 h-full items-center py-1">
         {sheets.map((sheet, sheetIndex) => (
           <div key={`sheet-${sheetIndex}`} className="snap-center shrink-0 flex flex-col items-center">
             <p className="mb-2 text-center text-[11px] sm:text-xs font-bold uppercase tracking-[.16em] text-[var(--text-muted)] shrink-0 h-[16px] leading-4">
               Sheet {sheetIndex + 1} of {sheets.length}
             </p>
             <div 
-              className="relative bg-[var(--bg-card)] shadow-xl shrink-0 rounded-md overflow-hidden border border-[var(--border-color)] w-[198px] h-[280px] sm:w-[226px] sm:h-[320px] lg:w-[311px] lg:h-[440px]"
+              className="relative bg-[var(--bg-card)] shadow-xl shrink-0 rounded-md overflow-hidden border border-[var(--border-color)] w-[190px] h-[268px] sm:w-[226px] sm:h-[320px] lg:w-[290px] lg:h-[410px]"
             >
               <div 
                 className="absolute inset-0 w-full h-full flex flex-col justify-between"
