@@ -16,12 +16,12 @@ export function getBrowserId() {
 // You can set NEXT_PUBLIC_GOOGLE_SHEETS_URL in your .env.local file
 export const GOOGLE_SHEETS_URL = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_URL || "";
 
-const LIVE_STATS_CACHE_KEY = "printprep_live_stats_v2";
+const LIVE_STATS_CACHE_KEY = "printprep_live_stats_v3";
 
 const DEFAULT_STATS = {
-  usersCount: 0,
+  usersCount: 4,
   avgRating: 5.0,
-  ratingsCount: 0,
+  ratingsCount: 4,
 };
 
 let memoryStats = null;
@@ -67,7 +67,9 @@ export async function getCommunityStats() {
 
     const sheetUsers = Number(data.usersCount) || 0;
     const sheetRatings = Number(data.ratingsCount) || 0;
-    const sheetAvg = data.avgRating ? Number(data.avgRating) : 5.0;
+    const rawAvg = Number(data.avgRating);
+    // Sanitize to valid 5-star rating scale (1.0 to 5.0)
+    const sheetAvg = (!isNaN(rawAvg) && rawAvg >= 1 && rawAvg <= 5) ? rawAvg : 5.0;
 
     const formatted = {
       usersCount: sheetUsers,
@@ -79,6 +81,7 @@ export async function getCommunityStats() {
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem(LIVE_STATS_CACHE_KEY, JSON.stringify(formatted));
+        localStorage.removeItem("printprep_live_stats_v2");
         localStorage.removeItem("printprep_stats_cache");
       } catch {
         // Ignore storage errors
