@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FileImage, FilePlus2, Files, Layers, Scissors, Minimize, CupSoda, MessageSquareHeart } from "lucide-react";
+import { FileImage, FilePlus2, Files, Layers, Scissors, Minimize, CupSoda, MessageSquareHeart, Mail } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import AmbientBackground from "./AmbientBackground";
 import NavStatsBadge from "./NavStatsBadge";
+import { openGmailCompose } from "../utils/analytics";
 
 const heroCopy = [
   {
@@ -223,6 +224,14 @@ export default function DashboardHub({ onLaunch, theme, setTheme, onFeedback }) 
             >
               <MessageSquareHeart size={14} className="text-[var(--accent-mint)]" />
               Feedback
+            </button>
+            <button
+              onClick={() => openGmailCompose()}
+              className="flex items-center gap-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] px-3.5 py-1.5 text-xs font-bold text-[var(--text-main)] transition hover:border-[#6B7FD7] hover:text-[#6B7FD7] hover:scale-105 active:scale-95 shadow-sm"
+              title="Feature requests & bug reports via Gmail"
+            >
+              <Mail size={14} className="text-[#6B7FD7]" />
+              Feature / Bug
             </button>
             <button
               onClick={() => onLaunch("support")}

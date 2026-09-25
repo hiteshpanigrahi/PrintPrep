@@ -213,3 +213,30 @@ export async function submitToGoogleSheets({ rating, feedback }) {
     return { success: false, error: err.message };
   }
 }
+
+/**
+ * Open Gmail compose directly (mobile app via mailto, desktop via mail.google.com)
+ */
+export function openGmailCompose(
+  subject = "[PrintPrep] Feature Request / Bug Report",
+  body = "Hi Hitesh,\n\nI have a feature request / bug report for PrintPrep:\n\n"
+) {
+  if (typeof window === "undefined") return;
+  const email = "hitesh.edu9@gmail.com";
+  const encSubject = encodeURIComponent(subject);
+  const encBody = encodeURIComponent(body);
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || "");
+
+  if (isMobile) {
+    // Opens native Gmail / email app on mobile devices
+    window.location.href = `mailto:${email}?subject=${encSubject}&body=${encBody}`;
+  } else {
+    // On desktop browsers, opens Gmail web compose directly in a new tab
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encSubject}&body=${encBody}`;
+    const win = window.open(gmailUrl, "_blank", "noopener,noreferrer");
+    if (!win) {
+      window.location.href = `mailto:${email}?subject=${encSubject}&body=${encBody}`;
+    }
+  }
+}
+

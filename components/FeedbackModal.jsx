@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Star, X, CupSoda, Send, Check } from "lucide-react";
+import { Star, X, CupSoda, Send, Check, Mail } from "lucide-react";
 import PeekRating from "./PeekRating";
-import { getUserRating, submitToGoogleSheets } from "../utils/analytics";
+import { getUserRating, submitToGoogleSheets, openGmailCompose } from "../utils/analytics";
 
 export default function FeedbackModal({ onClose, onSupport }) {
   const [existingRating, setExistingRating] = useState(null);
@@ -105,6 +105,21 @@ export default function FeedbackModal({ onClose, onSupport }) {
                 </button>
               </div>
             )}
+
+            {/* Direct Gmail contact for bugs / feature requests */}
+            <div className="mt-4 pt-3.5 border-t border-[var(--border-color)] w-full text-center">
+              <p className="text-[11px] text-[var(--text-muted)] mb-2">
+                Need a new feature or found a bug?
+              </p>
+              <button
+                type="button"
+                onClick={() => openGmailCompose()}
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-3.5 py-1.5 text-xs font-semibold text-[var(--text-main)] transition hover:border-[#6B7FD7] hover:text-[#6B7FD7] hover:scale-105 active:scale-95 shadow-sm"
+              >
+                <Mail size={13} className="text-[#6B7FD7]" />
+                Email Hitesh directly
+              </button>
+            </div>
           </div>
         ) : !submitted ? (
           <form onSubmit={handleSubmit} className="flex flex-col items-center">
@@ -167,6 +182,17 @@ export default function FeedbackModal({ onClose, onSupport }) {
                 </button>
               </div>
             )}
+
+            <div className="mt-3.5 w-full text-center">
+              <button
+                type="button"
+                onClick={() => openGmailCompose()}
+                className="text-[11px] text-[var(--text-muted)] hover:text-[#6B7FD7] transition inline-flex items-center gap-1.5"
+              >
+                <Mail size={12} className="text-[#6B7FD7]" />
+                <span>Feature request or bug report? <strong className="underline underline-offset-2">Email directly</strong></span>
+              </button>
+            </div>
           </form>
         ) : (
           <div className="py-2">
@@ -191,7 +217,21 @@ export default function FeedbackModal({ onClose, onSupport }) {
                 </button>
               </div>
             )}
-            
+
+            {/* Direct Gmail contact for bugs / feature requests */}
+            <div className="mt-4 pt-3.5 border-t border-[var(--border-color)] w-full text-center">
+              <p className="text-[11px] text-[var(--text-muted)] mb-2">
+                Need a new feature or found a bug?
+              </p>
+              <button
+                type="button"
+                onClick={() => openGmailCompose()}
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-3.5 py-1.5 text-xs font-semibold text-[var(--text-main)] transition hover:border-[#6B7FD7] hover:text-[#6B7FD7] hover:scale-105 active:scale-95 shadow-sm"
+              >
+                <Mail size={13} className="text-[#6B7FD7]" />
+                Email Hitesh directly
+              </button>
+            </div>
           </div>
         )}
       </div>
