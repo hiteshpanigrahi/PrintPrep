@@ -16,14 +16,12 @@ export function getBrowserId() {
 // You can set NEXT_PUBLIC_GOOGLE_SHEETS_URL in your .env.local file
 export const GOOGLE_SHEETS_URL = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_URL || "";
 
-const BASE_USERS = 1420;
-const BASE_REVIEWS = 88;
-const BASE_RATING = 4.9;
+const LIVE_STATS_CACHE_KEY = "printprep_live_stats_v2";
 
 const DEFAULT_STATS = {
-  usersCount: BASE_USERS,
-  avgRating: BASE_RATING,
-  ratingsCount: BASE_REVIEWS,
+  usersCount: 0,
+  avgRating: 5.0,
+  ratingsCount: 0,
 };
 
 let memoryStats = null;
@@ -32,7 +30,7 @@ export function getCachedStats() {
   if (memoryStats) return memoryStats;
   if (typeof window !== "undefined") {
     try {
-      const stored = localStorage.getItem("printprep_stats_cache");
+      const stored = localStorage.getItem(LIVE_STATS_CACHE_KEY);
       if (stored) {
         memoryStats = JSON.parse(stored);
         return memoryStats;
@@ -45,7 +43,7 @@ export function getCachedStats() {
 }
 
 /**
- * Fetch stats (active user count & average ratings) from Google Sheets or fallback gracefully
+ * Fetch purely live stats (active user count & average ratings) from Google Sheets
  */
 export async function getCommunityStats() {
   const cached = getCachedStats();
@@ -69,26 +67,19 @@ export async function getCommunityStats() {
 
     const sheetUsers = Number(data.usersCount) || 0;
     const sheetRatings = Number(data.ratingsCount) || 0;
-    const sheetAvg = Number(data.avgRating) || 5.0;
-
-    // Harmonize live entries with baseline community stats
-    const totalUsers = BASE_USERS + sheetUsers;
-    const totalReviews = BASE_REVIEWS + sheetRatings;
-    const blendedRating =
-      sheetRatings > 0
-        ? ((BASE_RATING * BASE_REVIEWS) + (sheetAvg * sheetRatings)) / totalReviews
-        : BASE_RATING;
+    const sheetAvg = data.avgRating ? Number(data.avgRating) : 5.0;
 
     const formatted = {
-      usersCount: totalUsers,
-      avgRating: Number(blendedRating.toFixed(1)),
-      ratingsCount: totalReviews,
+      usersCount: sheetUsers,
+      avgRating: Number(sheetAvg.toFixed(1)),
+      ratingsCount: sheetRatings,
     };
 
     memoryStats = formatted;
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("printprep_stats_cache", JSON.stringify(formatted));
+        localStorage.setItem(LIVE_STATS_CACHE_KEY, JSON.stringify(formatted));
+        localStorage.removeItem("printprep_stats_cache");
       } catch {
         // Ignore storage errors
       }
