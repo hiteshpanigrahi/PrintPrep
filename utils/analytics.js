@@ -100,6 +100,48 @@ export async function getCommunityStats() {
   }
 }
 
+const VISIT_RECORDED_KEY = "printprep_visit_registered";
+
+/**
+ * Register user visit once per unique browser ID
+ */
+export async function registerUniqueVisit() {
+  if (typeof window === "undefined") return;
+  // If this unique browser has already been registered, never send duplicate visit
+  if (localStorage.getItem(VISIT_RECORDED_KEY)) {
+    return;
+  }
+
+  const browserId = getBrowserId();
+  if (!browserId) return;
+
+  // Mark as registered in localStorage so reloads/navigation never duplicate
+  localStorage.setItem(VISIT_RECORDED_KEY, "true");
+
+  const endpoint =
+    GOOGLE_SHEETS_URL ||
+    "https://script.google.com/macros/s/AKfycbwjbsltyavmgfOnxBG07o-67F5SmuR-ne2MregTtXRmgGJxjBfKl0Wpy_zcbu_COE5TLg/exec";
+
+  try {
+    await fetch(endpoint, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "registerVisit",
+        browserId,
+        type: "visit",
+        timestamp: new Date().toISOString(),
+      }),
+    });
+  } catch (err) {
+    // On network failure, clear key so it can retry later
+    localStorage.removeItem(VISIT_RECORDED_KEY);
+  }
+}
+
 /**
  * Register user visit and/or send feedback entry to Google Sheets
  */
