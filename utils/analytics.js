@@ -16,12 +16,12 @@ export function getBrowserId() {
 // You can set NEXT_PUBLIC_GOOGLE_SHEETS_URL in your .env.local file
 export const GOOGLE_SHEETS_URL = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_URL || "";
 
-const LIVE_STATS_CACHE_KEY = "printprep_live_stats_v4";
+const LIVE_STATS_CACHE_KEY = "printprep_live_stats_v5";
 
 const DEFAULT_STATS = {
-  usersCount: 2,
+  usersCount: 8,
   avgRating: 5.0,
-  ratingsCount: 2,
+  ratingsCount: 8,
 };
 
 let memoryStats = null;
