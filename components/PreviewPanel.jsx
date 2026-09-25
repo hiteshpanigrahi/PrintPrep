@@ -27,31 +27,30 @@ const PreviewPanel = forwardRef(({ pages, nUp, sheets, metrics }, ref) => {
       <div 
         ref={scrollRef}
         onWheel={handleWheel}
-        className="flex max-w-full snap-x snap-mandatory overflow-x-auto rounded-2xl bg-[var(--bg-secondary)] p-5 pb-7 custom-scrollbar h-full"
+        className="flex max-w-full snap-x snap-mandatory overflow-x-auto rounded-2xl bg-[var(--bg-secondary)] p-4 sm:p-5 custom-scrollbar h-full min-h-[330px] lg:min-h-0 items-center"
       >
-      <div className="flex flex-row gap-3 h-full">
+      <div className="flex flex-row gap-4 h-full items-center py-2">
         {sheets.map((sheet, sheetIndex) => (
-          <div key={`sheet-${sheetIndex}`} className="snap-center shrink-0 h-full flex flex-col items-center">
-            <p className="mb-3 text-center text-xs font-bold uppercase tracking-[.16em] text-[var(--text-muted)] shrink-0 h-[16px] leading-4">
+          <div key={`sheet-${sheetIndex}`} className="snap-center shrink-0 flex flex-col items-center">
+            <p className="mb-2 text-center text-[11px] sm:text-xs font-bold uppercase tracking-[.16em] text-[var(--text-muted)] shrink-0 h-[16px] leading-4">
               Sheet {sheetIndex + 1} of {sheets.length}
             </p>
-            <div className="relative h-[calc(100%-28px)] bg-[var(--bg-card)] shadow-xl shrink-0">
-              {/* This SVG mathematically forces the correct intrinsic width based on available height */}
-              <svg viewBox="0 0 595.28 841.89" className="h-full w-auto block pointer-events-none opacity-0" />
-              
+            <div 
+              className="relative bg-[var(--bg-card)] shadow-xl shrink-0 rounded-md overflow-hidden border border-[var(--border-color)] w-[198px] h-[280px] sm:w-[226px] sm:h-[320px] lg:w-[311px] lg:h-[440px]"
+            >
               <div 
-                className="absolute inset-0 flex flex-col justify-between"
+                className="absolute inset-0 w-full h-full flex flex-col justify-between"
                 style={{ padding: `${(metrics.margin / 595.28) * 100}%` }}
               >
                 {sheet.map((page) => (
                   <div
                     key={page.id}
-                    className="flex-1 overflow-hidden border border-[var(--border-color)] mb-[1.5%] last:mb-0"
+                    className="flex-1 min-h-0 relative overflow-hidden border border-[var(--border-color)] mb-[1.5%] last:mb-0 bg-white/5 flex items-center justify-center"
                   >
                     <img
                       src={page.thumbnailUrl}
                       alt="Preview slide"
-                      className="h-full w-full object-contain"
+                      className="absolute inset-0 w-full h-full object-contain"
                       style={{ transform: `rotate(${page.rotation || 0}deg)` }}
                     />
                   </div>

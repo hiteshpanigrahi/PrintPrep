@@ -54,13 +54,13 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
       <div className="flex flex-col lg:flex-row h-auto lg:h-full max-h-[92vh] w-full max-w-6xl overflow-y-auto lg:overflow-hidden rounded-3xl border border-[var(--border-color)] bg-[var(--bg-panel)] text-[var(--text-main)] paper-shadow">
 
         {/* Main Content (Left) */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-visible lg:overflow-hidden">
+        <div className="flex-1 flex flex-col shrink-0 lg:shrink lg:overflow-hidden">
+          <div className="flex-1 flex flex-col p-5 sm:p-6 md:p-8">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--accent-coral)]">Final check</p>
-                <h2 className="font-display text-3xl font-bold">Preview</h2>
-                <p className="mt-1 text-sm text-[var(--text-muted)]">
+                <h2 className="font-display text-2xl sm:text-3xl font-bold">Preview</h2>
+                <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
                   {included.length} slides · {sheets.length} A4 sheets · {nUp}-up
                 </p>
               </div>
@@ -74,7 +74,7 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
               </button>
             </div>
 
-            <div className="mt-8 flex-1 min-h-[50vh] lg:min-h-0">
+            <div className="mt-6 w-full min-h-[360px] sm:min-h-[400px] lg:min-h-0 lg:h-full lg:flex-1">
               <PreviewPanel ref={previewPanelRef} pages={pages} nUp={nUp} sheets={sheets} metrics={metrics} />
             </div>
           </div>
@@ -112,8 +112,8 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
         </div>
 
         {/* Sidebar (Right) */}
-        <div className="w-full lg:w-[380px] flex-1 lg:flex-none border-t lg:border-t-0 lg:border-l border-[var(--border-color)] bg-[var(--bg-panel)] flex flex-col justify-between overflow-y-auto custom-scrollbar">
-          <div className="p-6 md:p-8">
+        <div className="w-full lg:w-[380px] shrink-0 lg:flex-none border-t lg:border-t-0 lg:border-l border-[var(--border-color)] bg-[var(--bg-panel)] flex flex-col justify-between overflow-y-visible lg:overflow-y-auto custom-scrollbar">
+          <div className="p-5 sm:p-6 md:p-8">
             <div className="hidden lg:flex justify-end mb-6">
               <button
                 onClick={onClose}

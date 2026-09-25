@@ -14,9 +14,7 @@ export function getBrowserId() {
 
 // Configurable endpoint (Google Apps Script Web App URL or proxy endpoint)
 // You can set NEXT_PUBLIC_GOOGLE_SHEETS_URL in your .env.local file
-export const GOOGLE_SHEETS_URL =
-  process.env.NEXT_PUBLIC_GOOGLE_SHEETS_URL ||
-  "https://script.google.com/macros/s/AKfycbwjbsltyavmgfOnxBG07o-67F5SmuR-ne2MregTtXRmgGJxjBfKl0Wpy_zcbu_COE5TLg/exec";
+export const GOOGLE_SHEETS_URL = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_URL || "";
 
 /**
  * Fetch stats (active user count & average ratings) from Google Sheets or fallback gracefully
