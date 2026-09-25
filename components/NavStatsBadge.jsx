@@ -2,12 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { Users, Star } from "lucide-react";
-import { getBrowserId, getCommunityStats, getCachedStats, registerUniqueVisit } from "../utils/analytics";
+import { 
+  getBrowserId, 
+  getCommunityStats, 
+  getCachedStats, 
+  registerUniqueVisit, 
+  DEFAULT_STATS 
+} from "../utils/analytics";
 
 export default function NavStatsBadge({ className = "", onClick }) {
-  const [stats, setStats] = useState(() => getCachedStats());
+  const [stats, setStats] = useState(DEFAULT_STATS);
 
   useEffect(() => {
+    // Read cached stats after mount to prevent server-client hydration mismatch
+    const cached = getCachedStats();
+    if (cached) {
+      setStats(cached);
+    }
+
     // Ensure browser id is initialized and unique visit is registered once
     getBrowserId();
     registerUniqueVisit();

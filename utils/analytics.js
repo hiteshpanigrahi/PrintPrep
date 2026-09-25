@@ -18,7 +18,7 @@ export const GOOGLE_SHEETS_URL = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_URL || ""
 
 const LIVE_STATS_CACHE_KEY = "printprep_live_stats_v5";
 
-const DEFAULT_STATS = {
+export const DEFAULT_STATS = {
   usersCount: 8,
   avgRating: 5.0,
   ratingsCount: 8,
@@ -65,8 +65,8 @@ export async function getCommunityStats() {
     if (!res.ok) throw new Error("Failed to fetch stats");
     const data = await res.json();
 
-    const sheetUsers = Number(data.usersCount) || 0;
-    const sheetRatings = Number(data.ratingsCount) || 0;
+    const sheetUsers = Math.max(Number(data.usersCount) || 0, 8);
+    const sheetRatings = Math.max(Number(data.ratingsCount) || 0, 8);
     const rawAvg = Number(data.avgRating);
     // Sanitize to valid 5-star rating scale (1.0 to 5.0)
     const sheetAvg = (!isNaN(rawAvg) && rawAvg >= 1 && rawAvg <= 5) ? rawAvg : 5.0;
