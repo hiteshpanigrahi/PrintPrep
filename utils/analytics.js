@@ -142,25 +142,70 @@ export async function registerUniqueVisit() {
   }
 }
 
+const USER_RATING_KEY = "printprep_user_rating";
+
 /**
- * Register user visit and/or send feedback entry to Google Sheets
+ * Get permanent rating previously submitted by this browser
+ */
+export function getUserRating() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(USER_RATING_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed.rating === "number" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Check if this browser has already submitted a permanent rating
+ */
+export function hasUserRated() {
+  return getUserRating() !== null;
+}
+
+/**
+ * Register user visit and/or send feedback entry to Google Sheets (one-time lock per browser)
  */
 export async function submitToGoogleSheets({ rating, feedback }) {
+  // If user has already rated in the past, never allow overwriting or changing
+  if (hasUserRated()) {
+    console.info("User has already rated. Rating is permanent and cannot be modified.");
+    return { success: true, alreadyRated: true };
+  }
+
   const browserId = getBrowserId();
+  const timestamp = new Date().toISOString();
   const payload = {
     browserId,
     rating: rating || 5,
     feedback: feedback || "",
-    timestamp: new Date().toISOString(),
+    timestamp,
   };
 
-  if (!GOOGLE_SHEETS_URL) {
-    console.info("Google Sheets URL not configured yet. Payload ready for sending:", payload);
-    return { success: true, localOnly: true };
+  // Lock locally permanently so user can never modify or be prompted again
+  try {
+    localStorage.setItem(
+      USER_RATING_KEY,
+      JSON.stringify({
+        rating: rating || 5,
+        feedback: feedback || "",
+        timestamp,
+      })
+    );
+    localStorage.setItem(VISIT_RECORDED_KEY, "true");
+  } catch {
+    // Ignore storage errors
   }
 
+  const endpoint =
+    GOOGLE_SHEETS_URL ||
+    "https://script.google.com/macros/s/AKfycbwjbsltyavmgfOnxBG07o-67F5SmuR-ne2MregTtXRmgGJxjBfKl0Wpy_zcbu_COE5TLg/exec";
+
   try {
-    const response = await fetch(GOOGLE_SHEETS_URL, {
+    await fetch(endpoint, {
       method: "POST",
       mode: "no-cors", // Google Apps Script handles no-cors redirects reliably
       headers: {

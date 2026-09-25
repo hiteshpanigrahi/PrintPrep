@@ -2,29 +2,42 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Star, X, CupSoda, Send, Check } from "lucide-react";
+import { Star, X, CupSoda, Send, Check, Lock } from "lucide-react";
 import PeekRating from "./PeekRating";
+import { getUserRating, submitToGoogleSheets } from "../utils/analytics";
 
 export default function FeedbackModal({ onClose, onSupport }) {
+  const [existingRating, setExistingRating] = useState(null);
   const [rating, setRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    setMounted(true);
+    const saved = getUserRating();
+    if (saved) {
+      setExistingRating(saved);
+    }
+  }, []);
 
   const handleRating = (val) => {
+    if (existingRating) return; // Prevent any interaction if already rated
     setRating(val);
   };
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
+    if (existingRating) return;
     if (!rating && !feedbackText.trim()) return;
     setSubmitting(true);
     try {
-      const { submitToGoogleSheets } = await import("../utils/analytics");
       await submitToGoogleSheets({
+        rating: rating || 5,
+        feedback: feedbackText.trim(),
+      });
+      setExistingRating({
         rating: rating || 5,
         feedback: feedbackText.trim(),
       });
@@ -48,7 +61,52 @@ export default function FeedbackModal({ onClose, onSupport }) {
           <X size={16} />
         </button>
 
-        {!submitted ? (
+        {existingRating ? (
+          <div className="py-2">
+            <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-yellow-500/15 text-yellow-500">
+              <Star size={24} className="fill-current" />
+            </div>
+            <h2 className="font-display text-2xl font-bold text-[var(--text-main)]">Rating Recorded</h2>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              You rated PrintPrep {existingRating.rating} / 5 stars.
+            </p>
+
+            <div className="mt-4 flex justify-center pb-2 opacity-90 pointer-events-none">
+              <PeekRating
+                value={existingRating.rating}
+                readOnly={true}
+                activeColor="#eab308"
+                idleColor="var(--border-color)"
+                size={30}
+              />
+            </div>
+
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--bg-secondary)] px-3 py-1 text-[11px] text-[var(--text-muted)] border border-[var(--border-color)]">
+              <Lock size={12} className="text-[var(--accent-mint)]" />
+              <span>Rating is permanently locked for this device</span>
+            </div>
+
+            {existingRating.feedback && (
+              <p className="mt-3 text-xs italic text-[var(--text-muted)] bg-[var(--bg-secondary)] p-2.5 rounded-xl border border-[var(--border-color)] max-w-xs mx-auto">
+                &ldquo;{existingRating.feedback}&rdquo;
+              </p>
+            )}
+
+            {onSupport && (
+              <div className="mt-5 rounded-2xl border border-[var(--accent-coral)]/30 bg-[var(--accent-coral)]/10 p-4 text-center">
+                <p className="text-xs font-bold text-[var(--text-main)]">Enjoying the tool?</p>
+                <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">Consider fueling the project with a tip!</p>
+                <button
+                  onClick={onSupport}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-4 py-2.5 text-xs font-bold text-[var(--bg-main)] transition hover:brightness-110 hover:scale-[1.02] active:scale-95 shadow-sm"
+                >
+                  <CupSoda size={15} />
+                  Buy me a drink
+                </button>
+              </div>
+            )}
+          </div>
+        ) : !submitted ? (
           <form onSubmit={handleSubmit} className="flex flex-col items-center">
             <div className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-yellow-500/10 text-yellow-500">
               <Star size={24} className="fill-current" />

@@ -14,6 +14,7 @@ import PdfSplitterTool from "../components/PdfSplitterTool";
 import CompressorTool from "../components/CompressorTool";
 import ConfirmModal from "../components/ConfirmModal";
 import SupportPage from "../components/SupportPage";
+import { hasUserRated } from "../utils/analytics";
 
 export default function Home() {
   const [screen, setScreen] = useState("hub"); // "hub" | "slide-landing" | "slide-editor" | "merge-pdf" | "images-to-pdf" | "pdf-to-images" | "pdf-splitter"
@@ -89,6 +90,12 @@ export default function Home() {
     changeScreen("hub");
   }
 
+  function handleDownloadComplete() {
+    if (!hasUserRated()) {
+      setModal("feedback");
+    }
+  }
+
   return (
     <ToastProvider>
       <main data-theme={theme} className={`min-h-screen bg-[var(--bg-main)] ${theme === "dark" ? "dark" : ""}`}>
@@ -135,7 +142,7 @@ export default function Home() {
               theme={theme}
               setTheme={setTheme}
               onBackToHub={handleBackToHub}
-              onDownloaded={() => setModal("feedback")}
+              onDownloaded={handleDownloadComplete}
             />
           </div>
         )}
@@ -147,7 +154,7 @@ export default function Home() {
               theme={theme}
               setTheme={setTheme}
               onBackToHub={handleBackToHub}
-              onDownloaded={() => setModal("feedback")}
+              onDownloaded={handleDownloadComplete}
             />
           </div>
         )}
@@ -159,7 +166,7 @@ export default function Home() {
               theme={theme}
               setTheme={setTheme}
               onBackToHub={handleBackToHub}
-              onDownloaded={() => setModal("feedback")}
+              onDownloaded={handleDownloadComplete}
             />
           </div>
         )}
@@ -171,7 +178,7 @@ export default function Home() {
               theme={theme}
               setTheme={setTheme}
               onBackToHub={handleBackToHub}
-              onDownloaded={() => setModal("feedback")}
+              onDownloaded={handleDownloadComplete}
             />
           </div>
         )}
@@ -183,7 +190,7 @@ export default function Home() {
               theme={theme}
               setTheme={setTheme}
               onBackToHub={handleBackToHub}
-              onDownloaded={() => setModal("feedback")}
+              onDownloaded={handleDownloadComplete}
             />
           </div>
         )}
@@ -206,7 +213,7 @@ export default function Home() {
             nUp={nUp}
             setNUp={setNUp}
             onClose={() => setModal(null)}
-            onDownloaded={() => setModal("feedback")}
+            onDownloaded={handleDownloadComplete}
           />
         )}
         {modal === "feedback" && (
