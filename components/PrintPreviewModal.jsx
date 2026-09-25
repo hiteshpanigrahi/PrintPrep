@@ -1,17 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { Download, LoaderCircle, X, Layers, FileText, Check } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { Download, LoaderCircle, X, Layers, FileText, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { createOptimizedPdf, getLayoutMetrics } from "../utils/nUpLayoutEngine";
 import { createDocx } from "../utils/docxExporter";
 import PreviewPanel from "./PreviewPanel";
+import SegmentedControl from "./SegmentedControl";
 
 export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownloaded }) {
+  const previewPanelRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [format, setFormat] = useState("pdf");
   const [progress, setProgress] = useState(null);
   const included = pages.filter((page) => page.isIncluded);
   const metrics = getLayoutMetrics(nUp);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const sheets = [];
   for (let index = 0; index < included.length; index += nUp) sheets.push(included.slice(index, index + nUp));
 
@@ -39,37 +47,39 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="flex flex-col lg:flex-row h-full max-h-[92vh] w-full max-w-6xl overflow-hidden rounded-3xl border border-[var(--border-color)] bg-[var(--bg-panel)] text-[var(--text-main)] paper-shadow">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="flex flex-col lg:flex-row h-auto lg:h-full max-h-[92vh] w-full max-w-6xl overflow-y-auto lg:overflow-hidden rounded-3xl border border-[var(--border-color)] bg-[var(--bg-panel)] text-[var(--text-main)] paper-shadow">
 
         {/* Main Content (Left) */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto custom-scrollbar">
+          <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-visible lg:overflow-hidden">
             <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--accent-coral)]">Final check</p>
-              <h2 className="font-display text-3xl font-bold">Preview</h2>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                {included.length} slides · {sheets.length} A4 sheets · {nUp}-up
-              </p>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--accent-coral)]">Final check</p>
+                <h2 className="font-display text-3xl font-bold">Preview</h2>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">
+                  {included.length} slides · {sheets.length} A4 sheets · {nUp}-up
+                </p>
+              </div>
+              {/* Mobile close button */}
+              <button
+                onClick={onClose}
+                className="lg:hidden grid h-9 w-9 place-items-center rounded-full bg-[var(--accent-coral)] text-[var(--bg-main)] transition hover:brightness-110"
+                aria-label="Close preview"
+              >
+                <X size={17} />
+              </button>
             </div>
-            {/* Mobile close button */}
-            <button
-              onClick={onClose}
-              className="lg:hidden grid h-9 w-9 place-items-center rounded-full bg-[var(--accent-coral)] text-[var(--bg-main)] transition hover:brightness-110"
-              aria-label="Close preview"
-            >
-              <X size={17} />
-            </button>
+
+            <div className="mt-8 flex-1 min-h-[50vh] lg:min-h-0">
+              <PreviewPanel ref={previewPanelRef} pages={pages} nUp={nUp} sheets={sheets} metrics={metrics} />
+            </div>
           </div>
 
-          <div className="mt-8 flex-1 min-h-0">
-            <PreviewPanel pages={pages} nUp={nUp} sheets={sheets} metrics={metrics} />
-          </div>
-          </div>
-          
-          <div className="hidden lg:block p-6 md:p-8 border-t border-[var(--border-color)] bg-[var(--bg-main)]">
+          <div className="hidden lg:flex p-6 md:p-8 border-t border-[var(--border-color)] bg-[var(--bg-main)] items-center justify-between">
             <button
               onClick={onClose}
               disabled={busy}
@@ -77,6 +87,27 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
             >
               Keep editing
             </button>
+            
+            {/* Scroll Controls */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => previewPanelRef.current?.scrollBy(-350)}
+                disabled={sheets.length <= 1}
+                className="grid h-10 w-10 place-items-center rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-main)] transition-colors hover:bg-[var(--border-color)] active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              
+              <button
+                onClick={() => previewPanelRef.current?.scrollBy(350)}
+                disabled={sheets.length <= 1}
+                className="grid h-10 w-10 place-items-center rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-main)] transition-colors hover:bg-[var(--border-color)] active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+                aria-label="Scroll right"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -117,21 +148,19 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
                     <button
                       key={opt.id}
                       onClick={() => setNUp(opt.id)}
-                      className={`flex w-full items-center justify-between rounded-xl border p-4 transition text-left ${
-                        nUp === opt.id
+                      className={`flex w-full items-center justify-between rounded-xl border p-4 transition text-left ${nUp === opt.id
                           ? "border-[var(--accent-mint)] bg-[var(--accent-mint)]/5"
                           : "border-[var(--border-color)] bg-[var(--bg-secondary)] hover:border-[var(--text-muted)]"
-                      }`}
+                        }`}
                     >
                       <div>
                         <span className="block font-bold text-[var(--text-main)]">{opt.title}</span>
                         <span className="block text-xs text-[var(--text-muted)] mt-1">{opt.desc}</span>
                       </div>
-                      <div className={`grid h-6 w-6 place-items-center rounded-full border ${
-                        nUp === opt.id
+                      <div className={`grid h-6 w-6 place-items-center rounded-full border ${nUp === opt.id
                           ? "border-[var(--accent-mint)] bg-[var(--accent-mint)] text-[var(--bg-main)]"
                           : "border-[var(--border-color)] border-2"
-                      }`}>
+                        }`}>
                         {nUp === opt.id && <Check size={14} strokeWidth={3} />}
                       </div>
                     </button>
@@ -146,23 +175,12 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
                   <FileText size={16} className="text-[var(--accent-coral)]" />
                   <span className="text-sm font-bold text-[var(--text-main)]">Export format</span>
                 </div>
-                <div className="relative flex rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] p-1 w-full">
-                  <div 
-                    className="absolute bottom-1 left-1 top-1 w-[calc((100%-8px)/2)] rounded-lg bg-[var(--bg-card)] shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                    style={{ transform: `translateX(calc(${format === "pdf" ? 0 : 1} * 100%))` }}
+                <div className="w-full">
+                  <SegmentedControl
+                    items={['PDF', 'DOCX']}
+                    value={format.toUpperCase()}
+                    onChange={(val) => setFormat(val.toLowerCase())}
                   />
-                  <button
-                    onClick={() => setFormat("pdf")}
-                    className={`relative z-10 flex-1 rounded-lg py-2.5 text-xs font-bold transition-colors duration-300 ${format === "pdf" ? "text-[var(--text-main)]" : "text-[var(--text-muted)] hover:text-[var(--text-main)]"}`}
-                  >
-                    PDF
-                  </button>
-                  <button
-                    onClick={() => setFormat("docx")}
-                    className={`relative z-10 flex-1 rounded-lg py-2.5 text-xs font-bold transition-colors duration-300 ${format === "docx" ? "text-[var(--text-main)]" : "text-[var(--text-muted)] hover:text-[var(--text-main)]"}`}
-                  >
-                    DOCX
-                  </button>
                 </div>
               </div>
             </div>
@@ -205,6 +223,7 @@ export default function PrintPreviewModal({ pages, nUp, setNUp, onClose, onDownl
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.querySelector("main") || document.body
   );
 }

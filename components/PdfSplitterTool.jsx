@@ -211,7 +211,7 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
-      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(file !== null)} badge="Splitter" />
+      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(fileData !== null)} badge="Splitter" />
 
       <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
         <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">

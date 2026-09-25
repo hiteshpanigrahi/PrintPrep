@@ -22,12 +22,12 @@ export async function renderPdfFile(file, onProgress) {
       });
     }
     const page = await pdf.getPage(index);
-    const viewport = page.getViewport({ scale: 1.35 });
+    const viewport = page.getViewport({ scale: 3.0 });
     const canvas = document.createElement("canvas");
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
-    const thumbUrl = await canvasToBlobUrl(canvas, "image/jpeg", 0.88);
+    const thumbUrl = await canvasToBlobUrl(canvas, "image/jpeg", 0.95);
     pages.push({ thumbnailUrl: thumbUrl, fileType: "pdf", mimeType: "image/jpeg", sourceFileName: file.name, originalIndex: index - 1, originalFile: file });
     if (onProgress) {
       onProgress({
@@ -103,7 +103,7 @@ export function applyPixelFilter(dataUrl, mode = "smart") {
       }
 
       context.putImageData(pixels, 0, 0);
-      canvasToBlobUrl(canvas, "image/jpeg", 0.9).then(resolve);
+      canvasToBlobUrl(canvas, "image/jpeg", 0.95).then(resolve);
     };
     image.src = dataUrl;
   });

@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { Download, FilePlus2, LoaderCircle, UploadCloud, X, RotateCw, Trash2 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import ToolHeader from "./ToolHeader";
+import SegmentedControl from "./SegmentedControl";
 
 if (typeof window !== "undefined") {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -150,7 +151,7 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
-      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(file !== null)} badge="PDF → Images" />
+      <ToolHeader theme={theme} setTheme={setTheme} onBackToHub={() => onBackToHub(images.length > 0)} badge="PDF → Images" />
 
       <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -161,22 +162,18 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
           </div>
           <div className="flex items-end gap-2">
             {/* Resolution selector */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 w-full sm:w-auto">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] pl-1">Quality</span>
-              <div className="relative flex rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] p-1">
-                <div 
-                  className="absolute bottom-1 left-1 top-1 w-[calc((100%-8px)/3)] rounded-lg bg-[var(--bg-card)] shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                  style={{ transform: `translateX(calc(${scale - 1} * 100%))` }}
+              <div className="w-full sm:w-[320px]">
+                <SegmentedControl
+                  items={[
+                    { value: "1", label: "Standard" },
+                    { value: "2", label: "High" },
+                    { value: "3", label: "Max" }
+                  ]}
+                  value={scale.toString()}
+                  onChange={(val) => setScale(parseInt(val))}
                 />
-                {[1, 2, 3].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setScale(s)}
-                    className={`relative z-10 flex-1 px-4 py-1.5 text-center text-xs font-bold rounded-lg transition-colors duration-300 ${scale === s ? "text-[var(--text-main)]" : "text-[var(--text-muted)] hover:text-[var(--text-main)]"}`}
-                  >
-                    {s === 1 ? "Standard" : s === 2 ? "High" : "Max"}
-                  </button>
-                ))}
               </div>
             </div>
             {images.length > 0 && (
@@ -227,7 +224,7 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
                 <div className="checkerboard relative aspect-[3/4]">
                   <img src={img.url} alt={`Page ${img.pageNum}`} className="h-full w-full object-contain transition-transform duration-300" style={{ transform: `rotate(${img.rotation || 0}deg)` }} />
                   <div className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-[var(--accent-mint)] text-[10px] font-bold text-[var(--bg-main)]">{img.pageNum}</div>
-                  
+
                   {/* Hover Actions */}
                   <div className="hidden md:flex absolute inset-0 items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-sm pointer-events-none">
                     <button onClick={(e) => { e.stopPropagation(); rotateImage(img.pageNum); }} className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-110" aria-label="Rotate">

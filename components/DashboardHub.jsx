@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FileImage, FilePlus2, Files, Layers, Scissors, Minimize, Coffee } from "lucide-react";
+import { FileImage, FilePlus2, Files, Layers, Scissors, Minimize, CupSoda } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
-import SupportModal from "./SupportModal";
+import AmbientBackground from "./AmbientBackground";
+import NavStatsBadge from "./NavStatsBadge";
 
 const heroCopy = [
   {
@@ -82,7 +83,6 @@ const TOOLS = [
 export default function DashboardHub({ onLaunch, theme, setTheme }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fade, setFade] = useState(true);
-  const [isSupportOpen, setIsSupportOpen] = useState(false);
   const [touchStartX, setTouchStartX] = useState(0);
 
   const intervalRef = useRef(null);
@@ -130,7 +130,9 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
+    <div className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] overflow-hidden">
+      <AmbientBackground />
+      
       {/* Navbar */}
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
         <div className="flex items-center gap-3">
@@ -139,12 +141,13 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
           <span className="hidden rounded-full bg-[var(--mint)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] sm:inline">Studio</span>
         </div>
         <div className="flex items-center gap-3">
+          <NavStatsBadge />
           <ThemeToggle theme={theme} setTheme={setTheme} />
         </div>
       </header>
 
       {/* Hero */}
-      <div 
+      <div
         className="mx-auto max-w-7xl px-6 pt-12 pb-6 lg:px-10 lg:pt-16 min-h-[300px] flex flex-col justify-center"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -208,23 +211,23 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
       {/* Footer */}
       <footer className="mx-auto max-w-7xl px-6 py-10 lg:px-10 border-t border-[var(--border-color)]">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-[var(--text-muted)]">
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div>
             <p>
               Created by <span className="font-bold text-[var(--text-main)]">Hitesh Panigrahi</span>
             </p>
-            <button 
-              onClick={() => setIsSupportOpen(true)}
-              className="flex items-center gap-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] px-4 py-1.5 text-xs font-bold text-[var(--text-main)] transition hover:brightness-105 hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95 shadow-sm"
-            >
-              <Coffee size={14} className="text-[var(--accent-coral)]" />
-              Buy me a coffee
-            </button>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <button
+              onClick={() => onLaunch("support")}
+              className="flex items-center gap-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] px-3.5 py-1.5 text-xs font-bold text-[var(--text-main)] transition hover:brightness-105 hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95 shadow-sm mr-1"
+            >
+              <CupSoda size={14} className="text-[var(--accent-coral)]" />
+              Buy me a drink
+            </button>
             <a href="https://github.com/hiteshpanigrahi" target="_blank" rel="noreferrer" className="hover:text-[var(--accent-mint)] transition-colors" aria-label="GitHub">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path></svg>
             </a>
-            <a href="https://www.linkedin.com/in/hiteshpanigrahi/" target="_blank" rel="noreferrer" className="hover:text-[var(--accent-mint)] transition-colors" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/in/hitesh-panigrahi-2244312b7/" target="_blank" rel="noreferrer" className="hover:text-[var(--accent-mint)] transition-colors" aria-label="LinkedIn">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
             </a>
             <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-[var(--accent-mint)] transition-colors" aria-label="Instagram">
@@ -233,8 +236,6 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
           </div>
         </div>
       </footer>
-
-      {isSupportOpen && <SupportModal onClose={() => setIsSupportOpen(false)} />}
     </div>
   );
 }

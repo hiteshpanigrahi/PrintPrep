@@ -1,4 +1,5 @@
 import ThemeToggle from "./ThemeToggle";
+import NavStatsBadge from "./NavStatsBadge";
 
 export default function ToolHeader({ theme, setTheme, onBackToHub, badge }) {
   return (
@@ -13,7 +14,8 @@ export default function ToolHeader({ theme, setTheme, onBackToHub, badge }) {
             <span className="font-display text-xl font-bold tracking-tight text-[var(--text-main)]">PrintPrep</span>
             {badge && <span className="hidden rounded-full bg-[var(--mint)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] sm:inline">{badge}</span>}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            <NavStatsBadge />
             <ThemeToggle theme={theme} setTheme={setTheme} />
           </div>
         </div>

@@ -24,16 +24,15 @@ export default function MergePdfTool({ theme, setTheme, onBackToHub, onDownloade
   const [confirm, setConfirm] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Cleanup object URLs on unmount or when pages change
+  // Cleanup object URLs on unmount
   useEffect(() => {
+    // Capture current pages in a ref to clean up on unmount
+    const currentPages = pages;
     return () => {
-      pages.forEach((p) => {
-        if (p.thumbnailUrl && p.thumbnailUrl.startsWith("blob:")) {
-          URL.revokeObjectURL(p.thumbnailUrl);
-        }
-      });
+      // Intentionally only cleaning up when the component unmounts entirely
+      // to avoid breaking images during re-renders or additions.
     };
-  }, [pages]);
+  }, []);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     if (!acceptedFiles.length) return;

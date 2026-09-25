@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useDropzone } from "react-dropzone";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { Download, FileImage, GripVertical, LoaderCircle, Maximize, Minimize, Plus, RotateCw, Trash2, X } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
 import ToolHeader from "./ToolHeader";
 import { useToast } from "./ToastProvider";
-import SidebarSettings from "./SidebarSettings";
 
 const A4_W = 1190; // 595 * 2
 const A4_H = 1684; // 842 * 2
@@ -114,7 +114,7 @@ async function exportImagesToPdf(images, settings, onProgress) {
     }
     
     // Convert canvas to jpeg blob
-    const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.85));
+    const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.95));
     const bytes = await blob.arrayBuffer();
     
     const pdfImg = await doc.embedJpg(bytes);
@@ -163,7 +163,12 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(null);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -255,7 +260,7 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
 
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto">
         {/* Main Center Canvas */}
-        <div className="flex-1 p-6 overflow-auto">
+        <div className="flex-1 p-6">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <p className="mb-1 text-xs font-bold uppercase tracking-[.2em] text-[var(--accent-coral)]">Sequence Editor</p>
@@ -354,12 +359,13 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
         </div>
       </div>
 
-      {showExportModal && (
+      {showExportModal && mounted && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-[var(--bg-main)] shadow-2xl animate-rise flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between border-b border-[var(--border-color)] bg-[var(--bg-panel)] px-6 py-5">
+          <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-[var(--bg-panel)] shadow-2xl animate-rise flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[var(--border-color)] px-6 py-5 shrink-0">
               <div>
-                <h3 className="font-display text-xl font-bold">Document Settings</h3>
+                <h3 className="font-display text-xl font-bold text-white">Export Settings</h3>
                 <p className="mt-1 text-xs text-[var(--text-muted)]">Configure how pages are rendered.</p>
               </div>
               <button onClick={() => !busy && setShowExportModal(false)} className="text-[var(--text-muted)] hover:text-[var(--accent-coral)] transition" disabled={busy}>
@@ -367,16 +373,8 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
               </button>
             </div>
 
-            <SidebarSettings
-              title="Document Settings"
-              description="Configure how pages are rendered."
-              onExport={handleExport}
-              exportLabel={`Download PDF (${images.length} pages)`}
-              busy={busy}
-              progress={progress}
-              exportDisabled={images.length === 0}
-              onCancel={() => !busy && setShowExportModal(false)}
-            >
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 min-h-0">
               {/* Orientation Options */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3 block">Orientation</label>
@@ -404,7 +402,7 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
                     <label key={opt.id} className={`flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition ${settings.layoutTemplate === opt.id ? "border-[var(--accent-mint)] bg-[var(--bg-secondary)]" : "border-[var(--border-color)] hover:border-[var(--accent-mint)]"}`}>
                       <input type="radio" name="layout" checked={settings.layoutTemplate === opt.id} onChange={() => setSettings(s => ({ ...s, layoutTemplate: opt.id }))} className="mt-1" />
                       <div>
-                        <p className="text-sm font-bold">{opt.label}</p>
+                        <p className="text-sm font-bold text-[var(--text-main)]">{opt.label}</p>
                         <p className="text-xs mt-1 text-[var(--text-muted)]">{opt.desc}</p>
                       </div>
                     </label>
@@ -435,9 +433,49 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
                   {settings.fitMode === "fit" ? "Images will be scaled down to fit entirely inside their layout box, maintaining aspect ratio. No cropping." : "Images will be scaled to completely cover their layout box. Parts of the image may be cropped."}
                 </p>
               </div>
-            </SidebarSettings>
+            </div>
+
+            {/* Sticky Footer */}
+            <div className="border-t border-[var(--border-color)] p-6 shrink-0">
+              <div className="flex flex-row gap-3">
+                <button
+                  onClick={() => !busy && setShowExportModal(false)}
+                  disabled={busy}
+                  className="flex-1 rounded-xl border border-[var(--border-color)] px-5 py-4 text-sm font-bold text-[var(--text-main)] transition hover:bg-[var(--bg-secondary)] disabled:opacity-50"
+                >
+                  Keep editing
+                </button>
+                <button
+                  onClick={handleExport}
+                  disabled={images.length === 0 || busy}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-coral)] px-5 py-4 text-sm font-bold text-[var(--bg-main)] transition hover:brightness-110 disabled:opacity-50"
+                >
+                  {busy ? (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 rounded-full border-2 border-[var(--bg-main)] border-t-transparent animate-spin" />
+                      Generating...
+                    </span>
+                  ) : (
+                    "Download PDF"
+                  )}
+                </button>
+              </div>
+              
+              {progress && (
+                <div className="mt-4 animate-rise">
+                  <div className="mb-2 flex justify-between text-xs">
+                    <span className="font-bold text-[var(--text-muted)]">{progress.text}</span>
+                    <span className="font-mono font-bold text-[var(--accent-mint)]">{progress.percent}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--bg-secondary)]">
+                    <div className="h-full rounded-full bg-[var(--accent-mint)] progress-shimmer transition-all duration-300" style={{ width: `${progress.percent}%` }} />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </div>,
+        document.querySelector("main") || document.body
       )}
     </div>
   );
