@@ -102,7 +102,12 @@ export default function Home() {
         {/* Multi-Tool Dashboard Hub */}
         {screen === "hub" && (
           <div className="animate-rise h-full w-full">
-            <DashboardHub onLaunch={handleLaunchTool} theme={theme} setTheme={setTheme} />
+            <DashboardHub 
+              onLaunch={handleLaunchTool} 
+              theme={theme} 
+              setTheme={setTheme} 
+              onFeedback={() => setModal("feedback")}
+            />
           </div>
         )}
 
@@ -114,6 +119,7 @@ export default function Home() {
               theme={theme}
               setTheme={setTheme}
               onBackToHub={handleBackToHub}
+              onFeedback={() => setModal("feedback")}
             />
           </div>
         )}

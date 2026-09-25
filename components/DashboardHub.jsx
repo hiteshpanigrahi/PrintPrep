@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FileImage, FilePlus2, Files, Layers, Scissors, Minimize, CupSoda } from "lucide-react";
+import { FileImage, FilePlus2, Files, Layers, Scissors, Minimize, CupSoda, MessageSquareHeart } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import AmbientBackground from "./AmbientBackground";
 import NavStatsBadge from "./NavStatsBadge";
@@ -80,7 +80,7 @@ const TOOLS = [
   },
 ];
 
-export default function DashboardHub({ onLaunch, theme, setTheme }) {
+export default function DashboardHub({ onLaunch, theme, setTheme, onFeedback }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const [touchStartX, setTouchStartX] = useState(0);
@@ -141,7 +141,7 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
           <span className="hidden rounded-full bg-[var(--mint)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] sm:inline">Studio</span>
         </div>
         <div className="flex items-center gap-3">
-          <NavStatsBadge />
+          <NavStatsBadge onClick={onFeedback} />
           <ThemeToggle theme={theme} setTheme={setTheme} />
         </div>
       </header>
@@ -216,10 +216,17 @@ export default function DashboardHub({ onLaunch, theme, setTheme }) {
               Created by <span className="font-bold text-[var(--text-main)]">Hitesh Panigrahi</span>
             </p>
           </div>
-          <div className="flex items-center gap-4 sm:gap-5">
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
+            <button
+              onClick={onFeedback}
+              className="flex items-center gap-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] px-3.5 py-1.5 text-xs font-bold text-[var(--text-main)] transition hover:border-[var(--accent-mint)] hover:text-[var(--accent-mint)] hover:scale-105 active:scale-95 shadow-sm"
+            >
+              <MessageSquareHeart size={14} className="text-[var(--accent-mint)]" />
+              Feedback
+            </button>
             <button
               onClick={() => onLaunch("support")}
-              className="flex items-center gap-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] px-3.5 py-1.5 text-xs font-bold text-[var(--text-main)] transition hover:brightness-105 hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95 shadow-sm mr-1"
+              className="flex items-center gap-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] px-3.5 py-1.5 text-xs font-bold text-[var(--text-main)] transition hover:brightness-105 hover:bg-[var(--bg-secondary)] hover:scale-105 active:scale-95 shadow-sm"
             >
               <CupSoda size={14} className="text-[var(--accent-coral)]" />
               Buy me a drink

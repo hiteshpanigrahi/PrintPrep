@@ -1,7 +1,7 @@
 import ThemeToggle from "./ThemeToggle";
 import NavStatsBadge from "./NavStatsBadge";
 
-export default function ToolHeader({ theme, setTheme, onBackToHub, badge }) {
+export default function ToolHeader({ theme, setTheme, onBackToHub, badge, onFeedback }) {
   return (
     <>
       <header className="">
@@ -15,7 +15,7 @@ export default function ToolHeader({ theme, setTheme, onBackToHub, badge }) {
             {badge && <span className="hidden rounded-full bg-[var(--mint)] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] sm:inline">{badge}</span>}
           </div>
           <div className="flex items-center gap-2.5">
-            <NavStatsBadge />
+            <NavStatsBadge onClick={onFeedback} />
             <ThemeToggle theme={theme} setTheme={setTheme} />
           </div>
         </div>

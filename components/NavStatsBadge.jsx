@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Users, Star } from "lucide-react";
 import { getBrowserId, getCommunityStats, getCachedStats, registerUniqueVisit } from "../utils/analytics";
 
-export default function NavStatsBadge({ className = "" }) {
+export default function NavStatsBadge({ className = "", onClick }) {
   const [stats, setStats] = useState(() => getCachedStats());
 
   useEffect(() => {
@@ -22,8 +22,12 @@ export default function NavStatsBadge({ className = "" }) {
 
   return (
     <div 
-      className={`flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-2 sm:px-2.5 py-1 text-xs font-semibold text-[var(--text-main)] shrink-0 select-none antialiased ${className}`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      className={`flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-2 sm:px-2.5 py-1 text-xs font-semibold text-[var(--text-main)] shrink-0 select-none antialiased ${onClick ? "cursor-pointer hover:border-[var(--accent-mint)] hover:scale-105 active:scale-95 transition-all" : ""} ${className}`}
       style={{ WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale" }}
+      title={onClick ? "Click to view ratings or give feedback" : undefined}
     >
       {/* Users Count */}
       <div className="flex items-center gap-1 text-[var(--text-muted)]" title={`${stats.usersCount || 0} unique users`}>
