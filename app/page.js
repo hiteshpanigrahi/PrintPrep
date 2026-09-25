@@ -26,6 +26,20 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Force instant scroll to top on fresh load / page open and disable automatic browser scroll restoration
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+
+      const rAF = requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      });
+
       const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setTheme(isDark ? "dark" : "light");
@@ -41,7 +55,10 @@ export default function Home() {
         }
       };
       window.addEventListener("popstate", handlePopState);
-      return () => window.removeEventListener("popstate", handlePopState);
+      return () => {
+        window.removeEventListener("popstate", handlePopState);
+        cancelAnimationFrame(rAF);
+      };
     }
   }, []);
 
@@ -101,7 +118,7 @@ export default function Home() {
       <main data-theme={theme} className={`min-h-screen bg-[var(--bg-main)] ${theme === "dark" ? "dark" : ""}`}>
         {/* Multi-Tool Dashboard Hub */}
         {screen === "hub" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <DashboardHub 
               onLaunch={handleLaunchTool} 
               theme={theme} 
@@ -113,7 +130,7 @@ export default function Home() {
 
         {/* Tool 1: Slide & Deck Optimizer (Landing dropzone) */}
         {screen === "slide-landing" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <LandingHero
               onFilesReady={handleFilesReady}
               theme={theme}
@@ -126,7 +143,7 @@ export default function Home() {
 
         {/* Tool 1: Slide & Deck Optimizer (Editor workspace) */}
         {screen === "slide-editor" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <EditorWorkspace
               pages={pages}
               setPages={setPages}
@@ -143,7 +160,7 @@ export default function Home() {
 
         {/* Tool 2: Merge & Organize PDFs */}
         {screen === "merge-pdf" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <MergePdfTool
               theme={theme}
               setTheme={setTheme}
@@ -155,7 +172,7 @@ export default function Home() {
 
         {/* Tool 3: Images to PDF Converter */}
         {screen === "images-to-pdf" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <ImagesToPdfTool
               theme={theme}
               setTheme={setTheme}
@@ -167,7 +184,7 @@ export default function Home() {
 
         {/* Tool 4: PDF to Image Extractor */}
         {screen === "pdf-to-images" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <PdfToImagesTool
               theme={theme}
               setTheme={setTheme}
@@ -179,7 +196,7 @@ export default function Home() {
 
         {/* Tool 5: PDF Page Splitter / Extractor */}
         {screen === "pdf-splitter" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <PdfSplitterTool
               theme={theme}
               setTheme={setTheme}
@@ -191,7 +208,7 @@ export default function Home() {
 
         {/* Tool 6: PDF & Image Compressor */}
         {screen === "compressor" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <CompressorTool
               theme={theme}
               setTheme={setTheme}
@@ -203,7 +220,7 @@ export default function Home() {
 
         {/* Support Page */}
         {screen === "support" && (
-          <div className="animate-rise h-full w-full">
+          <div className="animate-fade h-full w-full">
             <SupportPage
               theme={theme}
               setTheme={setTheme}
