@@ -13,7 +13,9 @@ export function ToastProvider({ children }) {
   }, []);
 
   const addToast = useCallback((message, type = "info") => {
-    const id = crypto.randomUUID();
+    const id = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" 
+      ? crypto.randomUUID() 
+      : "t_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
     setToasts((prev) => [...prev, { id, message, type }]);
     
     // Auto-remove after 5 seconds if not a loading toast
