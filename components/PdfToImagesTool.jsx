@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Download, FilePlus2, LoaderCircle, UploadCloud, X, RotateCw, Trash2 } from "lucide-react";
+import { Download, FilePlus2, LoaderCircle, UploadCloud, X, RotateCw, Trash2, ZoomIn } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import ToolHeader from "./ToolHeader";
 import SegmentedControl from "./SegmentedControl";
+import ZoomPreviewModal from "./ZoomPreviewModal";
 
 if (typeof window !== "undefined") {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -40,6 +41,7 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
   const [progress, setProgress] = useState(null);
   const [scale, setScale] = useState(2);
   const [pdfName, setPdfName] = useState("document");
+  const [zoomIndex, setZoomIndex] = useState(null);
   const fileInputRef = useRef(null);
 
   // Cleanup object URLs on unmount or when images change
@@ -219,10 +221,10 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
 
         {images.length > 0 && (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {images.map((img) => (
-              <div key={img.pageNum} className="group relative rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] overflow-hidden">
+            {images.map((img, index) => (
+              <div key={img.pageNum} className="group relative rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] overflow-hidden cursor-pointer" onClick={() => setZoomIndex(index)} title="Click or tap to view zoomed preview">
                 <div className="checkerboard relative aspect-[3/4]">
-                  <img src={img.url} alt={`Page ${img.pageNum}`} className="h-full w-full object-contain transition-transform duration-300" style={{ transform: `rotate(${img.rotation || 0}deg)` }} />
+                  <img src={img.url} alt={`Page ${img.pageNum}`} className="h-full w-full object-contain transition-transform duration-300 pointer-events-none" style={{ transform: `rotate(${img.rotation || 0}deg)` }} />
                   <div className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-[var(--accent-mint)] text-[10px] font-bold text-[var(--bg-main)]">{img.pageNum}</div>
 
                   {/* Hover Actions */}
@@ -230,13 +232,16 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
                     <button onClick={(e) => { e.stopPropagation(); rotateImage(img.pageNum); }} className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-110" aria-label="Rotate">
                       <RotateCw size={18} />
                     </button>
+                    <button onClick={(e) => { e.stopPropagation(); setZoomIndex(index); }} className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-[var(--accent-mint)] text-[var(--bg-main)] shadow-lg transition hover:scale-110" title="Zoom preview" aria-label="Zoom preview">
+                      <ZoomIn size={18} />
+                    </button>
                     <button onClick={(e) => { e.stopPropagation(); removeImage(img.pageNum); }} className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-white text-red-600 shadow-lg transition hover:scale-110" aria-label="Remove">
                       <Trash2 size={18} />
                     </button>
                   </div>
 
                   <button
-                    onClick={() => downloadOne(img)}
+                    onClick={(e) => { e.stopPropagation(); downloadOne(img); }}
                     className="hidden md:flex absolute bottom-2 right-2 items-center gap-1.5 rounded-full bg-[var(--bg-panel)] px-3 py-1.5 text-xs font-bold opacity-0 transition group-hover:opacity-100 border border-[var(--border-color)] hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)] z-10"
                   >
                     <Download size={12} /> Save
@@ -244,6 +249,9 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
                 </div>
                 <div className="flex md:hidden items-center justify-between rounded-b-xl bg-[var(--bg-card)] px-3 py-2.5">
                   <div className="flex gap-2">
+                    <button onClick={(e) => { e.stopPropagation(); setZoomIndex(index); }} className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]" title="Zoom">
+                      <ZoomIn size={14} />
+                    </button>
                     <button onClick={(e) => { e.stopPropagation(); rotateImage(img.pageNum); }} className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]" aria-label="Rotate">
                       <RotateCw size={14} />
                     </button>
@@ -251,7 +259,7 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
                       <Trash2 size={14} />
                     </button>
                   </div>
-                  <button onClick={() => downloadOne(img)} className="flex items-center gap-1.5 rounded-full bg-[var(--bg-secondary)] px-3 py-1.5 text-xs font-bold text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]">
+                  <button onClick={(e) => { e.stopPropagation(); downloadOne(img); }} className="flex items-center gap-1.5 rounded-full bg-[var(--bg-secondary)] px-3 py-1.5 text-xs font-bold text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]">
                     <Download size={12} /> Save
                   </button>
                 </div>
@@ -260,6 +268,23 @@ export default function PdfToImagesTool({ theme, setTheme, onBackToHub, onDownlo
           </div>
         )}
       </div>
+
+      {/* Zoomed Preview Lightbox */}
+      <ZoomPreviewModal
+        isOpen={zoomIndex !== null}
+        onClose={() => setZoomIndex(null)}
+        pages={images}
+        initialIndex={zoomIndex !== null ? zoomIndex : 0}
+        onUpdatePage={(pageNum, changes) => {
+          if (changes.rotation !== undefined) {
+            setImages((prev) =>
+              prev.map((img) =>
+                img.pageNum === pageNum ? { ...img, rotation: changes.rotation } : img
+              )
+            );
+          }
+        }}
+      />
     </div>
   );
 }

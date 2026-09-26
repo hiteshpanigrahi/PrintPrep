@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Check, CheckSquare, Download, LoaderCircle, Scissors, Settings, Square, UploadCloud } from "lucide-react";
+import { Check, CheckSquare, Download, LoaderCircle, Scissors, Settings, Square, UploadCloud, ZoomIn } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import { PDFDocument } from "pdf-lib";
 import ToolHeader from "./ToolHeader";
 import { useToast } from "./ToastProvider";
+import ZoomPreviewModal from "./ZoomPreviewModal";
 
 if (typeof window !== "undefined") {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -71,6 +72,7 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
   const [rangeInput, setRangeInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(null);
+  const [zoomIndex, setZoomIndex] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -290,12 +292,16 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
             <div className="flex-1 space-y-6">
               {/* Thumbnail Grid */}
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
-                {pages.map((p) => {
+                {pages.map((p, index) => {
                   const isSelected = selectedPages.has(p.pageNum);
                   return (
                     <div
                       key={p.pageNum}
                       onClick={() => togglePage(p.pageNum)}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        setZoomIndex(index);
+                      }}
                       className={`group relative cursor-pointer overflow-hidden rounded-xl border-2 transition-all ${
                         isSelected
                           ? "border-[var(--accent-mint)] bg-[var(--bg-card)] shadow-md"
@@ -303,7 +309,7 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
                       }`}
                     >
                       <div className="checkerboard relative aspect-[3/4] overflow-hidden">
-                        <img src={p.thumbUrl} alt={`Page ${p.pageNum}`} className="h-full w-full object-contain" />
+                        <img src={p.thumbUrl} alt={`Page ${p.pageNum}`} className="h-full w-full object-contain pointer-events-none" />
                         {/* Page badge */}
                         <div
                           className={`absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full text-[10px] font-bold ${
@@ -324,9 +330,23 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
                             </div>
                           )}
                         </div>
+
+                        {/* Quick Zoom Button */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setZoomIndex(index);
+                          }}
+                          className="absolute bottom-2 right-2 grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white backdrop-blur-sm opacity-80 sm:opacity-0 group-hover:opacity-100 hover:scale-110 hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)] transition-all shadow-md z-10"
+                          title="Zoom preview"
+                          aria-label={`Zoom preview for page ${p.pageNum}`}
+                        >
+                          <ZoomIn size={14} />
+                        </button>
                       </div>
-                      <div className="p-2 text-center text-xs font-bold text-[var(--text-muted)]">
-                        Page {p.pageNum}
+                      <div className="p-2 text-center text-xs font-bold text-[var(--text-muted)] flex items-center justify-center gap-1.5">
+                        <span>Page {p.pageNum}</span>
                       </div>
                     </div>
                   );
@@ -390,6 +410,14 @@ export default function PdfSplitterTool({ theme, setTheme, onBackToHub, onDownlo
           </div>
         )}
       </div>
+
+      {/* Zoomed Preview Lightbox */}
+      <ZoomPreviewModal
+        isOpen={zoomIndex !== null}
+        onClose={() => setZoomIndex(null)}
+        pages={pages}
+        initialIndex={zoomIndex !== null ? zoomIndex : 0}
+      />
     </div>
   );
 }

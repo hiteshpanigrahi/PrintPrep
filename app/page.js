@@ -116,10 +116,10 @@ export default function Home() {
         {/* Multi-Tool Dashboard Hub */}
         {screen === "hub" && (
           <div className="animate-fade h-full w-full">
-            <DashboardHub 
-              onLaunch={handleLaunchTool} 
-              theme={theme} 
-              setTheme={setTheme} 
+            <DashboardHub
+              onLaunch={handleLaunchTool}
+              theme={theme}
+              setTheme={setTheme}
               onFeedback={() => setModal("feedback")}
             />
           </div>

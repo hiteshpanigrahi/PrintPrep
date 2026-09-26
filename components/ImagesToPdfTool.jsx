@@ -4,10 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDropzone } from "react-dropzone";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
-import { Download, FileImage, GripVertical, LoaderCircle, Maximize, Minimize, Plus, RotateCw, Trash2, X } from "lucide-react";
+import { Download, FileImage, GripVertical, LoaderCircle, Maximize, Minimize, Plus, RotateCw, Trash2, X, ZoomIn } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
 import ToolHeader from "./ToolHeader";
 import { useToast } from "./ToastProvider";
+import ZoomPreviewModal from "./ZoomPreviewModal";
 
 const A4_W = 1190; // 595 * 2
 const A4_H = 1684; // 842 * 2
@@ -164,6 +165,8 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
   const [progress, setProgress] = useState(null);
   const [showExportModal, setShowExportModal] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [zoomIndex, setZoomIndex] = useState(null);
+  const pointerPosRef = useRef({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -308,16 +311,27 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
                           >
                             {index === 0 && <InsertMenu index={0} side="left" onInsert={handleInsert} />}
                             
-                            <div className="checkerboard relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-[var(--bg-secondary)]">
-                              <img src={img.url} alt={img.name} className="h-full w-full object-contain transition-transform duration-300" style={{ transform: `rotate(${img.rotation}deg)` }} />
+                            <div 
+                              className="checkerboard relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-[var(--bg-secondary)] cursor-pointer"
+                              onPointerDown={(e) => { pointerPosRef.current = { x: e.clientX, y: e.clientY }; }}
+                              onClick={(e) => {
+                                const dist = Math.hypot(e.clientX - pointerPosRef.current.x, e.clientY - pointerPosRef.current.y);
+                                if (dist < 8) setZoomIndex(index);
+                              }}
+                              title="Click or tap to view zoomed preview"
+                            >
+                              <img src={img.url} alt={img.name} className="h-full w-full object-contain transition-transform duration-300 pointer-events-none" style={{ transform: `rotate(${img.rotation}deg)` }} />
                               <div className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-[var(--accent-mint)] text-xs font-bold text-[var(--bg-main)] shadow-sm">{index + 1}</div>
                               
                               {/* Hover Actions */}
                               <div className="hidden md:flex absolute inset-0 items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-sm">
-                                <button onClick={() => rotate(img.id, -90)} className="grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-110" aria-label="Rotate CCW">
+                                <button type="button" onClick={(e) => { e.stopPropagation(); rotate(img.id, -90); }} className="grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-110" aria-label="Rotate CCW">
                                   <RotateCw size={18} className="-scale-x-100" />
                                 </button>
-                                <button onClick={() => rotate(img.id, 90)} className="grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-110" aria-label="Rotate CW">
+                                <button type="button" onClick={(e) => { e.stopPropagation(); setZoomIndex(index); }} className="grid h-10 w-10 place-items-center rounded-full bg-[var(--accent-mint)] text-[var(--bg-main)] shadow-lg transition hover:scale-110" title="Zoom preview" aria-label="Zoom preview">
+                                  <ZoomIn size={18} />
+                                </button>
+                                <button type="button" onClick={(e) => { e.stopPropagation(); rotate(img.id, 90); }} className="grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-lg transition hover:scale-110" aria-label="Rotate CW">
                                   <RotateCw size={18} />
                                 </button>
                               </div>
@@ -329,11 +343,14 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
                             
                             <div className="flex items-center justify-between rounded-b-2xl bg-[var(--bg-card)] px-3 py-3">
                               <span className="truncate text-xs font-bold text-[var(--text-muted)] max-w-[80px]">{img.name}</span>
-                              <div className="flex gap-2">
-                                <button onClick={() => rotate(img.id, 90)} className="grid h-7 w-7 md:hidden place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]">
+                              <div className="flex items-center gap-1.5">
+                                <button type="button" onClick={() => setZoomIndex(index)} className="grid h-7 w-7 md:hidden place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]" title="Zoom">
+                                  <ZoomIn size={14} />
+                                </button>
+                                <button type="button" onClick={() => rotate(img.id, 90)} className="grid h-7 w-7 md:hidden place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-mint)] hover:text-[var(--bg-main)]">
                                   <RotateCw size={14} />
                                 </button>
-                                <button onClick={() => remove(img.id)} className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-coral)] hover:text-[var(--bg-main)]">
+                                <button type="button" onClick={() => remove(img.id)} className="grid h-7 w-7 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] transition hover:bg-[var(--accent-coral)] hover:text-[var(--bg-main)]">
                                   <Trash2 size={14} />
                                 </button>
                               </div>
@@ -477,6 +494,21 @@ export default function ImagesToPdfTool({ theme, setTheme, onBackToHub, onDownlo
         </div>,
         document.querySelector("main") || document.body
       )}
+
+      {/* Zoomed Preview Lightbox */}
+      <ZoomPreviewModal
+        isOpen={zoomIndex !== null}
+        onClose={() => setZoomIndex(null)}
+        pages={images}
+        initialIndex={zoomIndex !== null ? zoomIndex : 0}
+        onUpdatePage={(id, changes) => {
+          if (changes.rotation !== undefined) {
+            setImages((prev) =>
+              prev.map((img) => (img.id === id ? { ...img, rotation: changes.rotation } : img))
+            );
+          }
+        }}
+      />
     </div>
   );
 }
